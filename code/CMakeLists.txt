@@ -19,13 +19,21 @@ message(STATUS "C compiler: ${CMAKE_C_COMPILER}  Version: ${CMAKE_C_COMPILER_VER
 pico_sdk_init()
 #-----------------------------------------------------------------------------
 
+# ------------------------------ Structure setup ------------------------------
+add_subdirectory(libs)
+#-----------------------------------------------------------------------------
+
 # ------------------------------ Firmware setup ------------------------------
 add_executable(ServoCore_firmware
         src/main.cpp
 )
 
 target_include_directories(ServoCore_firmware PRIVATE inc)
-target_link_libraries(ServoCore_firmware PUBLIC pico_stdlib)
+target_link_libraries(ServoCore_firmware PUBLIC
+        pico_stdlib
+
+        utils
+)
 
 pico_add_extra_outputs(ServoCore_firmware)
 
