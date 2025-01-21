@@ -21,6 +21,7 @@ pico_sdk_init()
 
 # ------------------------------ Structure setup ------------------------------
 add_subdirectory(libs)
+add_subdirectory(drivers)
 #-----------------------------------------------------------------------------
 
 # ------------------------------ Firmware setup ------------------------------
@@ -32,6 +33,7 @@ target_include_directories(ServoCore_firmware PRIVATE inc)
 target_link_libraries(ServoCore_firmware PUBLIC
         pico_stdlib
 
+        drivers
         utils
 )
 
