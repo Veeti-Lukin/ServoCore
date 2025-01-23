@@ -35,9 +35,6 @@ void uart0_isr() {
     if (uart_hw->mis & UART_UARTMIS_TXMIS_BITS) {
         uart0_controller.handleTxInterrupt();
     }
-
-    // clear handled interrupts (mandatory)
-    uart_hw->icr = UART_UARTICR_RXIC_BITS | UART_UARTICR_TXIC_BITS;
 }
 
 void initHW() {
