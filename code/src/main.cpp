@@ -3,6 +3,7 @@
 #include <hardware/structs/uart.h>
 #include <hardware/uart.h>
 
+#include "debug_print/debug_print.h"
 #include "drivers/BufferedAsyncUartDriver.h"
 #include "utils/RingBuffer.h"
 
@@ -21,6 +22,8 @@ utils::RingBuffer<128>           uart_rx_buffer;
 drivers::BufferedAsyncUartDriver uart0_controller(uart0, &uart_tx_buffer, &uart_rx_buffer, 115200,
                                                   uart_config::DataBits::eight, uart_config::StopBits::one,
                                                   uart_config::Parity::none);
+
+void uart0_putchar(char c) { uart0_controller.transmitByte(c); }
 
 void uart0_isr() {
     // access the UART hardware registers
@@ -51,10 +54,13 @@ void initHW() {
     uart0_controller.init();
 }
 
+void initSWLibs() { debug_print::connectPutCharFunction(&uart0_putchar); }
+
 int main() {
     initHW();
+    initSWLibs();
 
-    uart0_controller.transmitString("Hello World!\r\n");
+    DEBUG_PRINT("Starting up!");
 
     while (true) {
         while (uart0_controller.getReceivedBytesAvailableAmount() > 0) {
