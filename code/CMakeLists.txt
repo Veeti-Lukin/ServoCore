@@ -1,3 +1,16 @@
+# --------------------------------- Options ---------------------------------
+option(SERVO_CORE_BUILD_TESTS "Build tests on host platform" off)
+#----------------------------------------------------------------------------
+
+
+# ------------------------------ Test setup ------------------------------
+if (SERVO_CORE_BUILD_TESTS)
+    include(cmake/TestBuildCMakeLists.cmake)
+    return() # Skip all the other project setup in this file
+endif ()
+#-----------------------------------------------------------------------------
+
+
 # ------------------------------ Project setup ------------------------------
 cmake_minimum_required(VERSION 3.20.0)
 
