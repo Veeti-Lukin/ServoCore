@@ -67,6 +67,7 @@ void printFormat(const char* format_string);
  *
  * NOTES:
  *  - The escape/format character can only be brinted by formatting it as a character
+ *  - Floating points maximum is the same as for int64_t
  *
  * @tparam T The type of the first argument.
  * @tparam Args The types of the remaining arguments.

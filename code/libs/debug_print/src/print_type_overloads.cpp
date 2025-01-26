@@ -46,7 +46,11 @@ void printType(uint8_t value) { printType((uint64_t)value); }
 
 void printType(uint16_t value) { printType((uint64_t)value); }
 
+#ifdef __MINGW32__
+// Skip these overloads for MinGW to avoid redefinition when building tests
+#else
 void printType(uint32_t value) { printType((uint64_t)value); }
+#endif
 
 void printType(uint64_t value) {
     // TODO refactor this
@@ -134,7 +138,11 @@ void printType(int8_t value) { printType((int64_t)value); }
 
 void printType(int16_t value) { printType((int64_t)value); }
 
+#ifdef __MINGW32__
+// Skip these overloads for MinGW to avoid redefinition when building tests
+#else
 void printType(int32_t value) { printType((int64_t)value); }
+#endif
 
 void printType(int64_t value) {
     if (value < 0) {

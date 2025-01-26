@@ -27,6 +27,9 @@ void printFormat(const char* format_string) {
             token_ptr++;
             // if true this character is a formatting option and must be skipped and not printed after handling it in
             if (internal::tryParseFormattingOptions(*token_ptr)) token_ptr++;
+
+            // after moving the token pointer sanity check that not yet on null termination
+            if (*token_ptr == '\0') break;
         }
 
         // some terminals except carriage return before new line character

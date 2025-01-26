@@ -20,7 +20,7 @@ struct FormattingOptions {
 
 void resetFormattingOptions();
 
-void setFormattingOptions();
+void setFormattingOptions(FormattingOptions options);
 
 FormattingOptions getFormattingOptions();
 

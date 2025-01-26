@@ -33,7 +33,8 @@ void printType(bool value);
 
 template <typename T>
 void printType(const T* ptr) {
-    int pointer_address = reinterpret_cast<int>(ptr);
+    // uint64t should be big enough for pc test build and pico build
+    uint64_t pointer_address = reinterpret_cast<uint64_t>(ptr);
     printType(pointer_address);
 }
 
