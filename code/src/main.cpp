@@ -11,6 +11,8 @@
 #include "drivers/AnalogRgbLedDriver.h"
 #include "drivers/BufferedAsyncUartDriver.h"
 #include "drivers/PwmSliceDriver.h"
+#include "led_controller/LedController.h"
+#include "led_controller/common_colors.h"
 #include "utils/RingBuffer.h"
 
 #define UART_ID   uart0
@@ -35,15 +37,17 @@ drivers::BufferedAsyncUartDriver uart0_controller(uart0, &uart_tx_buffer, &uart_
                                                   uart_config::Parity::none);
 
 // --------------------------------- LED ---------------------------------
-drivers::PwmSliceDriver     red_slice_driver(pwm_gpio_to_slice_num(RGB_LED_RED_PIN));
-drivers::PwmSliceDriver     green_slice_driver(pwm_gpio_to_slice_num(RGB_LED_GREEN_PIN));
-drivers::PwmSliceDriver     blue_slice_driver(pwm_gpio_to_slice_num(RGB_LED_BLUE_PIN));
-drivers::AnalogRgbLedDriver led_driver(drivers::AnalogRgbLedType::common_cathode, &red_slice_driver,
-                                       drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(RGB_LED_RED_PIN)),
-                                       &green_slice_driver,
-                                       drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(RGB_LED_GREEN_PIN)),
-                                       &blue_slice_driver,
-                                       drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(RGB_LED_BLUE_PIN)));
+drivers::PwmSliceDriver       red_slice_driver(pwm_gpio_to_slice_num(RGB_LED_RED_PIN));
+drivers::PwmSliceDriver       green_slice_driver(pwm_gpio_to_slice_num(RGB_LED_GREEN_PIN));
+drivers::PwmSliceDriver       blue_slice_driver(pwm_gpio_to_slice_num(RGB_LED_BLUE_PIN));
+drivers::AnalogRgbLedDriver   led_driver(drivers::AnalogRgbLedType::common_cathode, &red_slice_driver,
+                                         drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(RGB_LED_RED_PIN)),
+                                         &green_slice_driver,
+                                         drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(RGB_LED_GREEN_PIN)),
+                                         &blue_slice_driver,
+                                         drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(RGB_LED_BLUE_PIN)));
+led_controller::LedController status_led_controller(&led_driver);
+repeating_timer               timer;
 
 void uart0_putchar(char c) { uart0_controller.transmitByte(c); }
 
@@ -60,6 +64,11 @@ void uart0_isr() {
     if (uart_hw->mis & UART_UARTMIS_TXMIS_BITS) {
         uart0_controller.handleTxInterrupt();
     }
+}
+
+bool led_timer_isr(__unused repeating_timer_t*) {
+    status_led_controller.periodicUpdate(20);
+    return true;
 }
 
 void initHW() {
@@ -82,6 +91,10 @@ void initHW() {
     // initializes the PWM:s for color control
     led_driver.init();
     led_driver.turnOn();
+    led_driver.setBrightness(25);
+
+    // --------------- INIT LED TIMER ---------------
+    add_repeating_timer_ms(-20, led_timer_isr, nullptr, &timer);
 }
 
 void initSWLibs() { debug_print::connectPutCharFunction(&uart0_putchar); }
@@ -92,17 +105,9 @@ int main() {
 
     DEBUG_PRINT("Starting up!\n");
 
-    led_driver.setBrightness(15);
-    led_driver.setColorRGB(255, 0, 0);
-    sleep_ms(1000);
-    led_driver.setColorRGB(0, 255, 0);
-    sleep_ms(1000);
-    led_driver.setColorRGB(0, 0, 255);
-    sleep_ms(1000);
-    led_driver.setColorRGB(255, 255, 255);
-
     while (true) {
         while (uart0_controller.getReceivedBytesAvailableAmount() > 0) {
+            status_led_controller.flashOverrideColor(led_controller::common_colors::K_ORANGE);
             uart0_controller.transmitByte(uart0_controller.readReceivedByte());
         }
     }
