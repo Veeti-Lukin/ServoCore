@@ -44,6 +44,8 @@ add_subdirectory(drivers)
 # ------------------------------ Firmware setup ------------------------------
 add_executable(ServoCore_firmware
         src/main.cpp
+
+        inc/hw_mappings.h
 )
 
 target_include_directories(ServoCore_firmware PRIVATE inc)
