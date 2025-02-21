@@ -55,6 +55,7 @@ target_link_libraries(ServoCore_firmware PUBLIC
         utils
         debug_print
         led_controller
+        parameter_system
 )
 
 pico_add_extra_outputs(ServoCore_firmware)
