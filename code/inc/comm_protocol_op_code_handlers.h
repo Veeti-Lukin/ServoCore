@@ -1,7 +1,7 @@
 #ifndef COMM_PROTOCOL_OP_CODE_HANDLERS_H
 #define COMM_PROTOCOL_OP_CODE_HANDLERS_H
 
-#include "comm_protocol/ProtocolHandler.h"
+#include "comm_protocol/SlaveProtocolHandler.h"
 
 namespace comm_protocol_op_code_handlers {
 

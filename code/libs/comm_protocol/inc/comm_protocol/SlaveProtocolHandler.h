@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <span>
 
-#include "comm_protocol/protocol_definition.h"
+#include "comm_protocol/packets.h"
 #include "drivers/interfaces/SerialBufferedCommunicationInterface.h"
 
 namespace comm_protocol {
@@ -14,11 +14,6 @@ enum class ResponseCode : uint8_t {
 
     unknown_operation_code,
     invalid_arguments,
-
-    placeholder1,
-    placeholder2,
-    placeholder3,
-    placeholder4,
 };
 
 struct ResponseData {
@@ -33,20 +28,19 @@ struct OperationCodeHandlerInfo {
     OperationCodeHandler handler;
 };
 
-class ProtocolHandler {
+class SlaveProtocolHandler {
 public:
-    explicit ProtocolHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
-                             std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
-                             drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface);
-    ~        ProtocolHandler() = default;
+    explicit SlaveProtocolHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
+                                  std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
+                                  drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface);
+    ~        SlaveProtocolHandler() = default;
 
     void registerHandler(uint8_t op_code, OperationCodeHandler handler);
 
-    void update();
+    void run();
 
 private:
-    OperationCodeHandler                getOpcodeHandler(uint8_t op_code);
-    static protocol_definitions::Packet constructResponsePacket(ResponseData response_data);
+    OperationCodeHandler getOpcodeHandler(uint8_t op_code);
 
     std::span<uint8_t> tx_buffer_;
     std::span<uint8_t> rx_buffer_;

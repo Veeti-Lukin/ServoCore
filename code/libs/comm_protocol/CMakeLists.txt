@@ -1,11 +1,11 @@
 add_library(comm_protocol STATIC
-        inc/comm_protocol/protocol_definition.h
+        inc/comm_protocol/packets.h
 
         inc/comm_protocol/serialize_deserialize.h
         src/serialize_deserialize.cpp
 
-        inc/comm_protocol/ProtocolHandler.h
-        src/ProtocolHandler.cpp
+        inc/comm_protocol/SlaveProtocolHandler.h
+        src/SlaveProtocolHandler.cpp
 )
 
 set_target_properties(comm_protocol PROPERTIES LINKER_LANGUAGE CXX)
