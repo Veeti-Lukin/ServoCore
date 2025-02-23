@@ -46,6 +46,9 @@ add_executable(ServoCore_firmware
         src/main.cpp
 
         inc/hw_mappings.h
+
+        inc/comm_protocol_op_code_handlers.h
+        src/comm_protocol_op_code_handlers.cpp
 )
 
 target_include_directories(ServoCore_firmware PRIVATE inc)
@@ -58,6 +61,7 @@ target_link_libraries(ServoCore_firmware PUBLIC
         debug_print
         led_controller
         parameter_system
+        comm_protocol
 )
 
 pico_add_extra_outputs(ServoCore_firmware)

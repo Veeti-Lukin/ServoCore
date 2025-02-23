@@ -7,6 +7,9 @@
 
 #include <cmath>
 
+#include "comm_protocol/ProtocolHandler.h"
+#include "comm_protocol/protocol_definition.h"
+#include "comm_protocol_op_code_handlers.h"
 #include "debug_print/debug_print.h"
 #include "drivers/AnalogRgbLedDriver.h"
 #include "drivers/BufferedAsyncUartDriver.h"
@@ -42,8 +45,18 @@ drivers::AnalogRgbLedDriver led_driver(
 led_controller::LedController status_led_controller(&led_driver);
 repeating_timer               timer;
 
+// ----------------------------- PARAMETER SYSTEM ------------------------------
 parameter_system::ParameterDelegateBase* parameter_buffer[64];
 parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
+
+// ----------------------------- COMM PROTOCOL --------------------------------
+
+uint8_t comm_protocol_tx_buffer[comm_protocol::protocol_definitions::K_PACKET_MAX_SIZE] = {};
+uint8_t comm_protocol_rx_buffer[comm_protocol::protocol_definitions::K_PACKET_MAX_SIZE] = {};
+comm_protocol::OperationCodeHandlerInfo handler_buffer[64];
+
+comm_protocol::ProtocolHandler protocol_handler({comm_protocol_tx_buffer}, {comm_protocol_rx_buffer}, {handler_buffer},
+                                                uart0_controller);
 
 void uart0_putchar(char c) { uart0_controller.transmitByte(c); }
 
@@ -100,6 +113,8 @@ int main() {
     initSWLibs();
 
     DEBUG_PRINT("Starting up!\n");
+
+    protocol_handler.registerHandler(1, comm_protocol_op_code_handlers::echo);
 
     uint8_t  test_uint8  = 42;
     uint16_t test_uint16 = 1337;
@@ -199,10 +214,12 @@ int main() {
 
     /// ************************* MAIN LOOP ************************* ///
     while (true) {
+        /*
         while (uart0_controller.getReceivedBytesAvailableAmount() > 0) {
             status_led_controller.flashOverrideColor(led_controller::common_colors::K_ORANGE);
             uart0_controller.transmitByte(uart0_controller.readReceivedByte());
-        }
+        }*/
+        protocol_handler.update();
     }
 
     return 0;
