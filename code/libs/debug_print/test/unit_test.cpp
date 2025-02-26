@@ -8,6 +8,7 @@
 
 std::string output;
 void        putChar(char c) { output.push_back(c); }
+void        flushMessages() {}
 void        resetOutput() { output = ""; }
 
 // ################################## GENERAL ######################################
@@ -214,7 +215,7 @@ TEST(Format_options, ptr_as_hex) {
 int main(int argc, char* argv[]) {
     testing::InitGoogleTest(&argc, argv);
 
-    debug_print::connectPutCharFunction(putChar);
+    debug_print::connectPutCharAndFlushFunctions(putChar, flushMessages);
 
     return RUN_ALL_TESTS();
 }

@@ -11,16 +11,21 @@ namespace debug_print {
 inline constexpr char K_PLACEHOLDER_FORMAT_CHAR = '%';
 
 using PutCharFunctionPointerType                = void (*)(char c);
+using FlushFunctionPointerType                  = void   (*)();
 
 /**
- * @brief Connect a function to use for sending a single character to peripheral device
+ * @brief Connect functions for sending a single character and flushing output.
  *
  * This function allows users to specify a function for outputting characters, enabling
  * custom implementations for specific peripherals (e.g., UART, USB, or display devices).
+ * Additionally, a flush function can be provided to ensure all buffered output is sent.
  *
- * @param put_char_function a function pointer to a putchar function
+ * @param put_char_function A function pointer to a putchar function for outputting characters.
+ * @param flush_function A function pointer to a flush function that ensures all pending output is transmitted
+ * (optional).
  */
-void connectPutCharFunction(PutCharFunctionPointerType put_char_function);
+void connectPutCharAndFlushFunctions(PutCharFunctionPointerType put_char_function,
+                                     FlushFunctionPointerType   flush_function);
 
 /**
  * @brief Disconnect the currently connected putchar function.
@@ -30,11 +35,25 @@ void connectPutCharFunction(PutCharFunctionPointerType put_char_function);
 void disconnectPutCharFunction();
 
 /**
+ * @brief Disconnect the currently connected flush function.
+ *
+ * Sets the internal flush function pointer to `nullptr`, effectively disabling flushing.
+ */
+void disconnectFlushFunction();
+
+/**
  * @brief Retrieve the currently connected putchar function.
  *
  * @return The function pointer to the connected putchar function, or `nullptr` if none is connected.
  */
 PutCharFunctionPointerType getPutCharFunction();
+
+/**
+ * @brief Flush any buffered output messages using the connected flush function.
+ *
+ * If a flush function is connected, this function will call it to ensure all output is sent.
+ */
+void flushMessages();
 
 /**
  * @brief Print format string using the connected PutChar function.

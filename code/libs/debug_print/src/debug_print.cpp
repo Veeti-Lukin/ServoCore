@@ -3,14 +3,23 @@
 namespace debug_print {
 
 extern PutCharFunctionPointerType put_char_function_pointer = nullptr;
+extern FlushFunctionPointerType   flush_function_pointer    = nullptr;
 
-void connectPutCharFunction(PutCharFunctionPointerType put_char_function) {
+void connectPutCharAndFlushFunctions(PutCharFunctionPointerType put_char_function,
+                                     FlushFunctionPointerType   flush_function) {
     put_char_function_pointer = put_char_function;
+    flush_function_pointer    = flush_function;
 }
 
 void disconnectPutCharFunction() { put_char_function_pointer = nullptr; }
 
+void disconnectFlushFunction() { put_char_function_pointer = nullptr; }
+
 PutCharFunctionPointerType getPutCharFunction() { return put_char_function_pointer; }
+
+void flushMessages() {
+    if (flush_function_pointer != nullptr) flush_function_pointer();
+}
 
 // Base case for printf
 void printFormat(const char* format_string) {

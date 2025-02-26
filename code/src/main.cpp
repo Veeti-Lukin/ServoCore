@@ -59,6 +59,7 @@ comm_protocol::SlaveProtocolHandler protocol_handler({comm_protocol_tx_buffer}, 
                                                      {handler_buffer}, uart0_controller);
 
 void uart0_putchar(char c) { uart0_controller.transmitByte(c); }
+void uart0_flush() { uart0_controller.flushTx(); }
 
 void uart0_isr() {
     // access the UART hardware registers
@@ -106,7 +107,7 @@ void initHW() {
     add_repeating_timer_ms(-20, led_timer_isr, nullptr, &timer);
 }
 
-void initSWLibs() { debug_print::connectPutCharFunction(&uart0_putchar); }
+void initSWLibs() { debug_print::connectPutCharAndFlushFunctions(&uart0_putchar, &uart0_flush); }
 
 int main() {
     initHW();

@@ -89,6 +89,9 @@ public:
      */
     void transmitBytes(std::span<uint8_t> bytes) override;
 
+    /** @brief Wait until all buffered TX data is transmitted */
+    void flushTx();
+
     /**
      * @brief Get the number of available bytes in the rx buffer.
      * This function checks how many bytes are currently available to be read from the buffer.
@@ -218,12 +221,37 @@ void BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::transmitByte(uint8
 
     uart_set_irqs_enabled(uart_instance_, true, true);
 }
+
 template <size_t tx_buffer_size, size_t rx_buffer_size>
 void BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::transmitBytes(std::span<uint8_t> bytes) {
     for (const uint8_t byte : bytes) {
         transmitByte(byte);
     }
 }
+
+template <size_t tx_buffer_size, size_t rx_buffer_size>
+void BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::flushTx() {
+    // Mutex: ensure the interrupt does not happen during this function
+    // Disables the possibility of race cases
+    uart_set_irqs_enabled(uart_instance_, true, false);
+
+    bool tx_buffer_is_empty = tx_ring_buffer_->isEmpty();
+
+    while (!tx_buffer_is_empty) {
+        // enable interrupt to let the uart take the next byte from the buffer
+        uart_set_irqs_enabled(uart_instance_, true, true);
+        tx_buffer_is_empty = tx_ring_buffer_->isEmpty();
+        uart_set_irqs_enabled(uart_instance_, true, false);
+    }
+
+    // Wait until the last byte is fully sent
+    while (!uart_is_writable(uart_instance_)) {
+        __asm volatile("nop");
+    }
+
+    // leave the Tx interrupt off since next transmit will enable it again
+}
+
 template <size_t tx_buffer_size, size_t rx_buffer_size>
 size_t BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::getReceivedBytesAvailableAmount() {
     return rx_ring_buffer_->bytesAvailable();
