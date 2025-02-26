@@ -1,11 +1,16 @@
 #include "parameter_system/ParameterDatabase.h"
 
+#include "assert/assert.h"
+
 namespace parameter_system {
 ParameterDatabase::ParameterDatabase(std::span<ParameterDelegateBase*> buffer) : buffer_(buffer) {}
 
 void ParameterDatabase::registerParameter(ParameterDelegateBase* parameter_delegate) {
-    // TODO assert buffer size vs registering index
-    // TODO assert id not already registered
+    ASSERT(parameter_delegate != nullptr);
+    ASSERT_WITH_MESSAGE(param_registering_index_ < buffer_.size(),
+                        "Parameter registering index out of bounds. Buffer too small");
+    ASSERT_WITH_MESSAGE(getParameterDelegateById(parameter_delegate->getMetaData()->id) == nullptr,
+                        "Parameter already registered");
     buffer_[param_registering_index_] = parameter_delegate;
     param_registering_index_++;
 }
@@ -14,6 +19,8 @@ size_t ParameterDatabase::getAmountOfRegisteredParameters() const { return param
 
 ParameterDelegateBase* ParameterDatabase::getParameterDelegateById(ParameterID id) const {
     for (ParameterDelegateBase* delegate : buffer_) {
+        if (delegate == nullptr) continue;
+
         if (delegate->getMetaData()->id == id) {
             return delegate;
         }

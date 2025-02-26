@@ -7,6 +7,7 @@
 
 #include <cmath>
 
+#include "assert/assert.h"
 #include "comm_protocol/SlaveProtocolHandler.h"
 #include "comm_protocol/packets.h"
 #include "comm_protocol_op_code_handlers.h"
@@ -46,14 +47,14 @@ led_controller::LedController status_led_controller(&led_driver);
 repeating_timer               timer;
 
 // ----------------------------- PARAMETER SYSTEM ------------------------------
-parameter_system::ParameterDelegateBase* parameter_buffer[64];
+parameter_system::ParameterDelegateBase* parameter_buffer[64] = {nullptr};
 parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
 
 // ----------------------------- COMM PROTOCOL --------------------------------
 
 uint8_t                                 comm_protocol_tx_buffer[comm_protocol::ResponsePacket::K_PACKET_MAX_SIZE] = {};
 uint8_t                                 comm_protocol_rx_buffer[comm_protocol::RequestPacket::K_PACKET_MAX_SIZE]  = {};
-comm_protocol::OperationCodeHandlerInfo handler_buffer[64];
+comm_protocol::OperationCodeHandlerInfo handler_buffer[64]                                                        = {};
 
 comm_protocol::SlaveProtocolHandler protocol_handler({comm_protocol_tx_buffer}, {comm_protocol_rx_buffer},
                                                      {handler_buffer}, uart0_controller);
@@ -107,10 +108,13 @@ void initHW() {
     add_repeating_timer_ms(-20, led_timer_isr, nullptr, &timer);
 }
 
-void initSWLibs() { debug_print::connectPutCharAndFlushFunctions(&uart0_putchar, &uart0_flush); }
+void initSWLibs() {
+    debug_print::connectPutCharAndFlushFunctions(&uart0_putchar, &uart0_flush);
+    assert::setAssertionFailedReaction(assert::OnAssertFailReaction::call_assertion_handler_and_break_point);
+}
 
 int main() {
-    initHW();
+    initHW();  // TODO can sw libs be initialized first?
     initSWLibs();
 
     DEBUG_PRINT("Starting up!\n");

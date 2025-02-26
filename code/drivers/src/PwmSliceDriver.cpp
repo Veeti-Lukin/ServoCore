@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <limits>
 
+#include "assert/assert.h"
 #include "debug_print/debug_print.h"
 
 namespace drivers {
@@ -22,7 +23,7 @@ unsigned int K_CLOCK_DIVIDER_MIN = 1;
 PwmChannel mapIndexToPwmChannel(const unsigned int index) {
     if (index == 0) return PwmChannel::A;
     if (index == 1) return PwmChannel::B;
-    // TODO assert false
+    ASSERT(index == 1 || index == 0);
     return PwmChannel::A;
 }
 
@@ -208,7 +209,8 @@ uint16_t PwmSliceDriver::getCounterCompareValue(PwmChannel channel) const {
         return (cc_value >> PWM_CH0_CC_B_LSB) & ((1 << PWM_CH0_CC_B_BITS) - 1);
     }
     // Should not happen
-    // TODO assert false
+    ASSERT(channel == PwmChannel::A || channel == PwmChannel::B);
+
     return 0;
 }
 

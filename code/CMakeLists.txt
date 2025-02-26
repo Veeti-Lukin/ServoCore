@@ -62,6 +62,7 @@ target_link_libraries(ServoCore_firmware PUBLIC
         led_controller
         parameter_system
         comm_protocol
+        assert
 )
 
 pico_add_extra_outputs(ServoCore_firmware)

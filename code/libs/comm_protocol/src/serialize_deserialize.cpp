@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include "assert/assert.h"
+
 namespace comm_protocol {
 
 bool responseHasValidCrc(ResponsePacket packet) {
@@ -15,21 +17,24 @@ bool requestHasValidCrc(RequestPacket packet) {
 }
 
 ResponsePacket deSerializeResponse(std::span<uint8_t> data) {
-    // TODO assert data.size_bytes >= K_PACKET_MIN_SIZE
+    ASSERT(data.size_bytes() >= ResponsePacket::K_PACKET_MIN_SIZE);
+
     ResponsePacket resp;
 
     resp.header.response_code = data[0];
     resp.header.payload_size  = data[1];
     resp.crc                  = data[2];
 
-    // TODO ASSERT DATA SIZE >= needed size to get to payload length
-    resp.payload              = data.subspan(ResponsePacket::K_PAYLOAD_START_OFFSET, resp.header.payload_size);
+    ASSERT(data.size_bytes() >= ResponsePacket::K_HEADER_WITH_CRC_SIZE + resp.header.payload_size);
+
+    resp.payload = data.subspan(ResponsePacket::K_PAYLOAD_START_OFFSET, resp.header.payload_size);
 
     return resp;
 }
 
 RequestPacket deSerializeRequest(std::span<uint8_t> data) {
-    // TODO assert data.size_bytes >= K_PACKET_MIN_SIZE
+    ASSERT(data.size_bytes() >= RequestPacket::K_PACKET_MIN_SIZE);
+
     RequestPacket req;
 
     req.header.receiver_id    = data[0];
@@ -37,8 +42,9 @@ RequestPacket deSerializeRequest(std::span<uint8_t> data) {
     req.header.payload_size   = data[2];
     req.crc                   = data[3];
 
-    // TODO ASSERT DATA SIZE >= needed size to get to payload length
-    req.payload               = data.subspan(RequestPacket::K_PAYLOAD_START_OFFSET, req.header.payload_size);
+    ASSERT(data.size_bytes() >= RequestPacket::K_HEADER_WITH_CRC_SIZE + req.header.payload_size);
+
+    req.payload = data.subspan(RequestPacket::K_PAYLOAD_START_OFFSET, req.header.payload_size);
     return req;
 }
 
@@ -66,7 +72,8 @@ std::span<uint8_t> serializeRequest(RequestPacket req, std::span<uint8_t> target
 }
 
 ResponsePacket::Header deSerializeResponseHeader(std::span<uint8_t> data) {
-    // TODO assert data.size_bytes >= K_HEADERS_SIZE
+    ASSERT(data.size_bytes() >= ResponsePacket::K_HEADER_SIZE);
+
     ResponsePacket::Header resp_header;
     resp_header.response_code = data[0];
     resp_header.payload_size  = data[1];
@@ -75,7 +82,8 @@ ResponsePacket::Header deSerializeResponseHeader(std::span<uint8_t> data) {
 }
 
 RequestPacket::Header deSerializeRequestHeader(std::span<uint8_t> data) {
-    // TODO assert data.size_bytes >= K_HEADERS_SIZE
+    ASSERT(data.size_bytes() >= RequestPacket::K_HEADER_SIZE);
+
     RequestPacket::Header req_header;
     req_header.receiver_id    = data[0];
     req_header.operation_code = data[1];

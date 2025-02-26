@@ -10,3 +10,5 @@ add_library(parameter_system STATIC
 set_target_properties(parameter_system PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(parameter_system PUBLIC inc)
+
+target_link_libraries(parameter_system PRIVATE assert)

@@ -1,5 +1,6 @@
 #include "comm_protocol/SlaveProtocolHandler.h"
 
+#include "assert/assert.h"
 #include "comm_protocol/packets.h"
 #include "comm_protocol/serialize_deserialize.h"
 
@@ -13,12 +14,13 @@ SlaveProtocolHandler::SlaveProtocolHandler(
       rx_buffer_(rx_buffer),
       communication_interface_(communication_interface),
       op_code_handlers_(op_code_handler_buffer) {
-    // TODO assert tx_buffer.size_bytes() == K_MAX_PACKET_SIZE
-    // TODO assert rx_buffer.size_bytes() == K_MAX_PACKET_SIZE
+    ASSERT_WITH_MESSAGE(tx_buffer_.size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE, "Too small tx_buffer");
+    ASSERT_WITH_MESSAGE(rx_buffer_.size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE, "Too small rx_buffer");
 }
 
 void SlaveProtocolHandler::registerHandler(uint8_t op_code, OperationCodeHandler handler) {
-    // assert registering index not bigger than buffer size
+    ASSERT_WITH_MESSAGE(op_code_handlers_.size() > op_code_handler_registering_index_,
+                        "Op code handler registering index out of bounds. Too small buffer");
     op_code_handlers_[op_code_handler_registering_index_] = {op_code, handler};
     op_code_handler_registering_index_++;
 }

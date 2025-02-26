@@ -1,7 +1,7 @@
 add_library(drivers
         inc/drivers/interfaces/SerialBufferedCommunicationInterface.h
         inc/drivers/interfaces/RgbLedInterface.h
-        
+
         inc/drivers/BufferedAsyncUartDriver.h
 
         inc/drivers/PwmSliceDriver.h
@@ -20,4 +20,5 @@ target_link_libraries(drivers PRIVATE
         pico_stdlib
         hardware_pwm
         debug_print
+        assert
 )

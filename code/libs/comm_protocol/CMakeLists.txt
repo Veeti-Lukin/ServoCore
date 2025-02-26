@@ -12,4 +12,4 @@ set_target_properties(comm_protocol PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(comm_protocol PUBLIC inc)
 
-target_link_libraries(comm_protocol PRIVATE drivers)
+target_link_libraries(comm_protocol PRIVATE drivers assert)
