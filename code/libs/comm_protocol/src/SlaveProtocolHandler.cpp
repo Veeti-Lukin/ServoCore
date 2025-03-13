@@ -18,12 +18,13 @@ SlaveProtocolHandler::SlaveProtocolHandler(
     ASSERT_WITH_MESSAGE(rx_buffer_.size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE, "Too small rx_buffer");
 }
 
+/*
 void SlaveProtocolHandler::registerHandler(uint8_t op_code, OperationCodeHandler handler) {
     ASSERT_WITH_MESSAGE(op_code_handlers_.size() > op_code_handler_registering_index_,
                         "Op code handler registering index out of bounds. Too small buffer");
     op_code_handlers_[op_code_handler_registering_index_] = {op_code, handler};
     op_code_handler_registering_index_++;
-}
+}*/
 
 void SlaveProtocolHandler::run() {
     static size_t rx_index             = 0;
@@ -51,23 +52,38 @@ void SlaveProtocolHandler::run() {
             // TODO do what?
         }
 
-        OperationCodeHandler op_code_handler = getOpcodeHandler(packet.header.operation_code);
+        /*
+        OperationCodeHandler op_code_handler = getOpcodeHandler(packet.header.operation_code);*/
+        void*                       op_code_handler         = nullptr;
+        OperationCodeHandlerWrapper op_code_handler_wrapper = nullptr;
+        for (OperationCodeHandlerInfo& op_code_handler_info : op_code_handlers_) {
+            if (op_code_handler_info.operation_code == packet.header.operation_code) {
+                op_code_handler         = op_code_handler_info.handler;
+                op_code_handler_wrapper = op_code_handler_info.wrapper;
+            }
+        }
+        ResponsePacket response_packet;
 
-        ResponseData response_data;
-        if (op_code_handler == nullptr) {
-            response_data = {ResponseCode::unknown_operation_code, {}};
-        } else {
-            response_data = op_code_handler(packet.payload);
+        if (op_code_handler_wrapper == nullptr && op_code_handler_wrapper == nullptr) {
+            response_packet = ResponsePacket(static_cast<uint8_t>(ResponseCode::unknown_operation_code), {});
         }
 
-        ResponsePacket     response(static_cast<uint8_t>(response_data.response_code), response_data.response_data);
-        std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
+        else {
+            std::span<uint8_t> raw_response_payload;
+            ResponseCode       response_code =
+                op_code_handler_wrapper(packet.payload, tx_buffer_, op_code_handler, raw_response_payload);
+
+            response_packet = ResponsePacket(static_cast<uint8_t>(response_code), raw_response_payload);
+        }
+
+        std::span<uint8_t> serialized_response = serializeResponse(response_packet, tx_buffer_);
         communication_interface_.transmitBytes(serialized_response);
 
         // TODO Resetting tx buffer and rx buffer
     }
 }
 
+/*
 OperationCodeHandler SlaveProtocolHandler::getOpcodeHandler(uint8_t op_code) {
     for (OperationCodeHandlerInfo op_code_info : op_code_handlers_) {
         if (op_code_info.operation_code == op_code) {
@@ -76,6 +92,6 @@ OperationCodeHandler SlaveProtocolHandler::getOpcodeHandler(uint8_t op_code) {
     }
 
     return nullptr;
-}
+}*/
 
 }  // namespace comm_protocol

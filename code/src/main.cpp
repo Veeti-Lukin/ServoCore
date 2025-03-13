@@ -119,7 +119,10 @@ int main() {
 
     DEBUG_PRINT("Starting up!\n");
 
-    protocol_handler.registerHandler(1, comm_protocol_op_code_handlers::echo);
+    // protocol_handler.registerHandler(1, comm_protocol_op_code_handlers::echo);
+    protocol_handler.registerHandler<comm_protocol_op_code_handlers::print_and_return_plus_1_req,
+                                     comm_protocol_op_code_handlers::print_and_return_plus_1_resp>(
+        2, comm_protocol_op_code_handlers::print_and_return_plus1);
 
     uint8_t  test_uint8  = 42;
     uint16_t test_uint16 = 1337;
