@@ -1,5 +1,5 @@
 # Create an option for assertion level (default is ENABLED)
-option(ServoCore_ASSERT_LEVEL "Assert Level (0=Disabled, 1=Enabled, 2=Verbose, 3=Debug)" 1)
+set(ServoCore_ASSERT_LEVEL 1 CACHE STRING "Assert Level (0=Disabled, 1=Enabled, 2=Verbose, 3=Debug)")
 
 add_library(assert STATIC
         inc/assert/assert.h
@@ -26,17 +26,17 @@ target_compile_definitions(assert PUBLIC ASSERT_LEVEL_ENABLED=${ASSERT_LEVEL_ENA
 target_compile_definitions(assert PUBLIC ASSERT_LEVEL_VERBOSE=${ASSERT_LEVEL_VERBOSE})
 target_compile_definitions(assert PUBLIC ASSERT_LEVEL_DEBUG=${ASSERT_LEVEL_DEBUG})
 
-# Ensure ASSERT_LEVEL is a valid value
-if (NOT ASSERT_LEVEL EQUAL ${ASSERT_LEVEL_DISABLED} AND
-        NOT ASSERT_LEVEL EQUAL ${ASSERT_LEVEL_ENABLED} AND
-        NOT ASSERT_LEVEL EQUAL ${ASSERT_LEVEL_VERBOSE} AND
-        NOT ASSERT_LEVEL EQUAL ${ASSERT_LEVEL_DEBUG})
+# Ensure ServoCore_ASSERT_LEVEL is a valid value
+if (NOT ServoCore_ASSERT_LEVEL EQUAL ${ASSERT_LEVEL_DISABLED} AND
+        NOT ServoCore_ASSERT_LEVEL EQUAL ${ASSERT_LEVEL_ENABLED} AND
+        NOT ServoCore_ASSERT_LEVEL EQUAL ${ASSERT_LEVEL_VERBOSE} AND
+        NOT ServoCore_ASSERT_LEVEL EQUAL ${ASSERT_LEVEL_DEBUG})
 
-    message(FATAL_ERROR "Invalid ServoCore_ASSERT_LEVEL value: ${ASSERT_LEVEL}. Must be 0 (Disabled), 1 (Enabled), 2 (Verbose) Or 3 (Debug)")
+    message(FATAL_ERROR "Invalid ServoCore_ASSERT_LEVEL value: ${ServoCore_ASSERT_LEVEL}. Must be 0 (Disabled), 1 (Enabled), 2 (Verbose) Or 3 (Debug)")
 endif ()
 
 
-target_compile_definitions(assert PUBLIC ASSERT_LEVEL=${ASSERT_LEVEL})
+target_compile_definitions(assert PUBLIC ServoCore_ASSERT_LEVEL=${ServoCore_ASSERT_LEVEL})
 
 
-message(STATUS "Assertion level set to: ${ASSERT_LEVEL}")
+message(STATUS "Assertion level set to: ${ServoCore_ASSERT_LEVEL}")
