@@ -9,4 +9,4 @@ set_target_properties(led_controller PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(led_controller PUBLIC inc)
 
-target_link_libraries(led_controller PRIVATE drivers)
+target_link_libraries(led_controller PRIVATE drivers_interfaces)

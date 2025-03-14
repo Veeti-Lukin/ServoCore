@@ -16,4 +16,5 @@ message(STATUS "C compiler: ${CMAKE_C_COMPILER}  Version: ${CMAKE_C_COMPILER_VER
 
 # ------------------------------ Structure setup ------------------------------
 add_subdirectory(libs)
+add_subdirectory(drivers)
 #-----------------------------------------------------------------------------

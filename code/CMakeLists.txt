@@ -56,7 +56,7 @@ target_link_libraries(ServoCore_firmware PUBLIC
         pico_stdlib
         hardware_pwm
 
-        drivers
+        drivers_pico
         utils
         debug_print
         led_controller
