@@ -1,9 +1,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "comm_protocol/packets.h"
+#include "serial_communication_framework/packets.h"
 
-namespace comm_protocol {
+namespace serial_communication_framework {
 
 bool responseHasValidCrc(ResponsePacket packet);
 bool requestHasValidCrc(RequestPacket packet);
@@ -17,6 +17,6 @@ bool requestHasValidCrc(RequestPacket packet);
 [[nodiscard]] ResponsePacket::Header deSerializeResponseHeader(std::span<uint8_t> data);
 [[nodiscard]] RequestPacket::Header  deSerializeRequestHeader(std::span<uint8_t> data);
 
-}  // namespace comm_protocol
+}  // namespace serial_communication_framework
 
 #endif  // PARSER_H

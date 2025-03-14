@@ -47,8 +47,8 @@ add_executable(ServoCore_firmware
 
         inc/hw_mappings.h
 
-        inc/comm_protocol_op_code_handlers.h
-        src/comm_protocol_op_code_handlers.cpp
+        inc/serial_communication_framework_op_code_handlers.h
+        src/serial_communication_framework_op_code_handlers.cpp
 )
 
 target_include_directories(ServoCore_firmware PRIVATE inc)
@@ -61,7 +61,7 @@ target_link_libraries(ServoCore_firmware PUBLIC
         debug_print
         led_controller
         parameter_system
-        comm_protocol
+        serial_communication_framework
         assert
 )
 

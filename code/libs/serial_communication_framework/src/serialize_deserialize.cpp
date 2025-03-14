@@ -1,10 +1,10 @@
-#include "comm_protocol/serialize_deserialize.h"
+#include "serial_communication_framework/serialize_deserialize.h"
 
 #include <cstring>
 
 #include "assert/assert.h"
 
-namespace comm_protocol {
+namespace serial_communication_framework {
 
 bool responseHasValidCrc(ResponsePacket packet) {
     // TODO implement
@@ -92,4 +92,4 @@ RequestPacket::Header deSerializeRequestHeader(std::span<uint8_t> data) {
     return req_header;
 }
 
-}  // namespace comm_protocol
+}  // namespace serial_communication_framework

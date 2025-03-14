@@ -5,7 +5,7 @@
 #include <limits>
 #include <span>
 
-namespace comm_protocol {
+namespace serial_communication_framework {
 
 struct RequestPacket {
     struct Header {
@@ -63,6 +63,6 @@ struct ResponsePacket {
           payload(payload) {}
 };
 
-}  // namespace comm_protocol
+}  // namespace serial_communication_framework
 
 #endif  // PROTOCOL_DEFINITION_H

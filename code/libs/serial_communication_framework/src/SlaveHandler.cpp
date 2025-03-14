@@ -1,15 +1,14 @@
-#include "comm_protocol/SlaveProtocolHandler.h"
+#include "serial_communication_framework/SlaveHandler.h"
 
 #include "assert/assert.h"
-#include "comm_protocol/packets.h"
-#include "comm_protocol/serialize_deserialize.h"
+#include "serial_communication_framework/packets.h"
+#include "serial_communication_framework/serialize_deserialize.h"
 
-namespace comm_protocol {
+namespace serial_communication_framework {
 
-SlaveProtocolHandler::SlaveProtocolHandler(
-    std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
-    std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
-    drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface)
+SlaveHandler::SlaveHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
+                           std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
+                           drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface)
     : tx_buffer_(tx_buffer),
       rx_buffer_(rx_buffer),
       communication_interface_(communication_interface),
@@ -18,14 +17,14 @@ SlaveProtocolHandler::SlaveProtocolHandler(
     ASSERT_WITH_MESSAGE(rx_buffer_.size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE, "Too small rx_buffer");
 }
 
-void SlaveProtocolHandler::registerHandler(uint8_t op_code, OperationCodeHandler handler) {
+void SlaveHandler::registerHandler(uint8_t op_code, OperationCodeHandler handler) {
     ASSERT_WITH_MESSAGE(op_code_handlers_.size() > op_code_handler_registering_index_,
                         "Op code handler registering index out of bounds. Too small buffer");
     op_code_handlers_[op_code_handler_registering_index_] = {op_code, handler};
     op_code_handler_registering_index_++;
 }
 
-void SlaveProtocolHandler::run() {
+void SlaveHandler::run() {
     static size_t rx_index             = 0;
     static size_t expected_packet_size = RequestPacket::K_PACKET_MAX_SIZE;
 
@@ -68,7 +67,7 @@ void SlaveProtocolHandler::run() {
     }
 }
 
-OperationCodeHandler SlaveProtocolHandler::getOpcodeHandler(uint8_t op_code) {
+OperationCodeHandler SlaveHandler::getOpcodeHandler(uint8_t op_code) {
     for (OperationCodeHandlerInfo op_code_info : op_code_handlers_) {
         if (op_code_info.operation_code == op_code) {
             return op_code_info.handler;
@@ -78,4 +77,4 @@ OperationCodeHandler SlaveProtocolHandler::getOpcodeHandler(uint8_t op_code) {
     return nullptr;
 }
 
-}  // namespace comm_protocol
+}  // namespace serial_communication_framework

@@ -4,22 +4,10 @@
 #include <cstdint>
 #include <span>
 
-#include "comm_protocol/packets.h"
 #include "drivers/interfaces/SerialBufferedCommunicationInterface.h"
+#include "serial_communication_framework/common.h"
 
-namespace comm_protocol {
-
-enum class ResponseCode : uint8_t {
-    ok,
-
-    unknown_operation_code,
-    invalid_arguments,
-};
-
-struct ResponseData {
-    ResponseCode       response_code;
-    std::span<uint8_t> response_data;
-};
+namespace serial_communication_framework {
 
 using OperationCodeHandler = ResponseData (*)(std::span<std::uint8_t> request_data);
 
@@ -28,12 +16,12 @@ struct OperationCodeHandlerInfo {
     OperationCodeHandler handler;
 };
 
-class SlaveProtocolHandler {
+class SlaveHandler {
 public:
-    explicit SlaveProtocolHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
-                                  std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
-                                  drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface);
-    ~        SlaveProtocolHandler() = default;
+    explicit SlaveHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
+                          std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
+                          drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface);
+    ~        SlaveHandler() = default;
 
     void registerHandler(uint8_t op_code, OperationCodeHandler handler);
 
@@ -51,6 +39,6 @@ private:
     size_t                              op_code_handler_registering_index_ = 0;
 };
 
-}  // namespace comm_protocol
+}  // namespace serial_communication_framework
 
 #endif  // PROTOCOLHANDLER_H

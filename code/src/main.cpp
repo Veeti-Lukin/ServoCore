@@ -8,9 +8,6 @@
 #include <cmath>
 
 #include "assert/assert.h"
-#include "comm_protocol/SlaveProtocolHandler.h"
-#include "comm_protocol/packets.h"
-#include "comm_protocol_op_code_handlers.h"
 #include "debug_print/debug_print.h"
 #include "drivers/AnalogRgbLedDriver.h"
 #include "drivers/BufferedAsyncUartDriver.h"
@@ -20,6 +17,9 @@
 #include "led_controller/common_colors.h"
 #include "parameter_system/ParameterDatabase.h"
 #include "parameter_system/ParameterDelegate.h"
+#include "serial_communication_framework/SlaveHandler.h"
+#include "serial_communication_framework/packets.h"
+#include "serial_communication_framework_op_code_handlers.h"
 #include "utils/RingBuffer.h"
 
 #define UART_ID   uart0
@@ -52,11 +52,11 @@ parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
 
 // ----------------------------- COMM PROTOCOL --------------------------------
 
-uint8_t                                 comm_protocol_tx_buffer[comm_protocol::ResponsePacket::K_PACKET_MAX_SIZE] = {};
-uint8_t                                 comm_protocol_rx_buffer[comm_protocol::RequestPacket::K_PACKET_MAX_SIZE]  = {};
-comm_protocol::OperationCodeHandlerInfo handler_buffer[64]                                                        = {};
+uint8_t                                 serial_communication_framework_tx_buffer[serial_communication_framework::ResponsePacket::K_PACKET_MAX_SIZE] = {};
+uint8_t                                 serial_communication_framework_rx_buffer[serial_communication_framework::RequestPacket::K_PACKET_MAX_SIZE]  = {};
+serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64]                                                        = {};
 
-comm_protocol::SlaveProtocolHandler protocol_handler({comm_protocol_tx_buffer}, {comm_protocol_rx_buffer},
+serial_communication_framework::SlaveHandler protocol_handler({serial_communication_framework_tx_buffer}, {serial_communication_framework_rx_buffer},
                                                      {handler_buffer}, uart0_controller);
 
 void uart0_putchar(char c) { uart0_controller.transmitByte(c); }
@@ -119,7 +119,7 @@ int main() {
 
     DEBUG_PRINT("Starting up!\n");
 
-    protocol_handler.registerHandler(1, comm_protocol_op_code_handlers::echo);
+    protocol_handler.registerHandler(1, serial_communication_framework_op_code_handlers::echo);
 
     uint8_t  test_uint8  = 42;
     uint16_t test_uint16 = 1337;
