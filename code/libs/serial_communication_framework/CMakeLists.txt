@@ -8,7 +8,9 @@ add_library(serial_communication_framework STATIC
 
         inc/serial_communication_framework/SlaveHandler.h
         src/SlaveHandler.cpp
-        
+
+        inc/serial_communication_framework/MasterHandler.h
+        src/MasterHandler.cpp
 )
 
 set_target_properties(serial_communication_framework PROPERTIES LINKER_LANGUAGE CXX)
