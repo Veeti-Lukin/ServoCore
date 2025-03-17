@@ -1,6 +1,6 @@
 add_library(utils STATIC
         inc/utils/RingBuffer.h
-        
+
         inc/utils/break_point.h
 )
 

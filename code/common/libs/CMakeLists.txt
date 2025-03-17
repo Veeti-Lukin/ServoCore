@@ -1,6 +1,4 @@
 add_subdirectory(utils)
 add_subdirectory(debug_print)
-add_subdirectory(led_controller)
-add_subdirectory(parameter_system)
 add_subdirectory(serial_communication_framework)
 add_subdirectory(assert)
