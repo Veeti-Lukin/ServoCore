@@ -34,5 +34,6 @@ if (SERVO_CORE_FIRMWARE_BUILD)
     add_subdirectory(common)
 else ()
     add_subdirectory(common)
+    add_subdirectory(dev_tool)
 endif ()
 #-----------------------------------------------------------------------------
