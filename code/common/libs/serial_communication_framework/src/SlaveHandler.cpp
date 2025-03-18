@@ -48,8 +48,13 @@ void SlaveHandler::run() {
         expected_packet_size = RequestPacket::K_PACKET_MAX_SIZE;
 
         RequestPacket packet = deSerializeRequest(rx_buffer_);
+
         if (requestHasValidCrc(packet) == false) {
-            // TODO do what?
+            // TODO log statistics
+            ResponsePacket     response(static_cast<uint8_t>(ResponseCode::corrupted), {});
+            std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
+            communication_interface_.transmitBytes(serialized_response);
+            return;
         }
 
         // Check if the packet is for this device or not
