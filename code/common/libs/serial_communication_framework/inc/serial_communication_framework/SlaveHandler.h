@@ -20,7 +20,8 @@ class SlaveHandler {
 public:
     explicit SlaveHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
                           std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
-                          drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface);
+                          drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface,
+                          uint8_t                                                    device_id);
     ~        SlaveHandler() = default;
 
     void registerHandler(uint8_t op_code, OperationCodeHandler handler);
@@ -37,6 +38,8 @@ private:
 
     std::span<OperationCodeHandlerInfo> op_code_handlers_;
     size_t                              op_code_handler_registering_index_ = 0;
+
+    uint8_t device_id_;
 };
 
 }  // namespace serial_communication_framework

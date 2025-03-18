@@ -8,11 +8,13 @@ namespace serial_communication_framework {
 
 SlaveHandler::SlaveHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
                            std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
-                           drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface)
+                           drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface,
+                           uint8_t                                                    device_id)
     : tx_buffer_(tx_buffer),
       rx_buffer_(rx_buffer),
       communication_interface_(communication_interface),
-      op_code_handlers_(op_code_handler_buffer) {
+      op_code_handlers_(op_code_handler_buffer),
+      device_id_(device_id) {
     ASSERT_WITH_MESSAGE(tx_buffer_.size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE, "Too small tx_buffer");
     ASSERT_WITH_MESSAGE(rx_buffer_.size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE, "Too small rx_buffer");
 }
@@ -48,6 +50,12 @@ void SlaveHandler::run() {
         RequestPacket packet = deSerializeRequest(rx_buffer_);
         if (requestHasValidCrc(packet) == false) {
             // TODO do what?
+        }
+
+        // Check if the packet is for this device or not
+        // If not, do not do anything with the packet
+        if (packet.header.receiver_id != device_id_) {
+            return;
         }
 
         OperationCodeHandler op_code_handler = getOpcodeHandler(packet.header.operation_code);
