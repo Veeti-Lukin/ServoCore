@@ -6,6 +6,7 @@
 
 #include "drivers/interfaces/SerialBufferedCommunicationInterface.h"
 #include "serial_communication_framework/common.h"
+#include "serial_communication_framework/packets.h"
 
 namespace serial_communication_framework {
 
@@ -18,8 +19,7 @@ struct OperationCodeHandlerInfo {
 
 class SlaveHandler {
 public:
-    explicit SlaveHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
-                          std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
+    explicit SlaveHandler(std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
                           drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface,
                           uint8_t                                                    device_id);
     ~        SlaveHandler() = default;
@@ -31,8 +31,8 @@ public:
 private:
     OperationCodeHandler getOpcodeHandler(uint8_t op_code);
 
-    std::span<uint8_t> tx_buffer_;
-    std::span<uint8_t> rx_buffer_;
+    uint8_t tx_buffer_[RequestPacket::K_PACKET_MAX_SIZE]  = {};
+    uint8_t rx_buffer_[ResponsePacket::K_PACKET_MAX_SIZE] = {};
 
     drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface_;
 

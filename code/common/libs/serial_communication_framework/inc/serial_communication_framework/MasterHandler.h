@@ -6,6 +6,7 @@
 
 #include "drivers/interfaces/SerialBufferedCommunicationInterface.h"
 #include "serial_communication_framework/common.h"
+#include "serial_communication_framework/packets.h"
 
 namespace serial_communication_framework {
 
@@ -13,20 +14,19 @@ using AsyncCallBack = void (*)(ResponseData);
 
 class MasterHandler {
 public:
-     MasterHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
-                   drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface);
-    ~MasterHandler() = default;
+    explicit MasterHandler(drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface);
+    ~        MasterHandler() = default;
 
-    ResponseData sendRequestAndReceiveResponseBlocking(uint8_t receiver_id, uint8_t operation_code,
-                                                       std::span<uint8_t> payload);
+    [[nodiscard]] ResponseData sendRequestAndReceiveResponseBlocking(uint8_t receiver_id, uint8_t operation_code,
+                                                                     std::span<uint8_t> payload);
     void sendRequestAndReceiveResponseASync(uint8_t receiver_id, uint8_t operation_code, std::span<uint8_t> payload,
                                             AsyncCallBack cb);
 
     void run();
 
 private:
-    std::span<uint8_t> tx_buffer_;
-    std::span<uint8_t> rx_buffer_;
+    uint8_t tx_buffer_[ResponsePacket::K_PACKET_MAX_SIZE] = {};
+    uint8_t rx_buffer_[RequestPacket::K_PACKET_MAX_SIZE]  = {};
 
     drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface_;
 

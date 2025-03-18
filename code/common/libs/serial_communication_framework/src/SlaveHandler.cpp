@@ -6,13 +6,10 @@
 
 namespace serial_communication_framework {
 
-SlaveHandler::SlaveHandler(std::span<uint8_t> tx_buffer, std::span<uint8_t> rx_buffer,
-                           std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
+SlaveHandler::SlaveHandler(std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
                            drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface,
                            uint8_t                                                    device_id)
-    : tx_buffer_(tx_buffer),
-      rx_buffer_(rx_buffer),
-      communication_interface_(communication_interface),
+    : communication_interface_(communication_interface),
       op_code_handlers_(op_code_handler_buffer),
       device_id_(device_id) {
     ASSERT_WITH_MESSAGE(tx_buffer_.size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE, "Too small tx_buffer");

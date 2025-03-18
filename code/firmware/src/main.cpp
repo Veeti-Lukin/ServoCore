@@ -51,15 +51,8 @@ parameter_system::ParameterDelegateBase* parameter_buffer[64] = {nullptr};
 parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
 
 // ----------------------------- COMM PROTOCOL --------------------------------
-
-uint8_t serial_communication_framework_tx_buffer[serial_communication_framework::ResponsePacket::K_PACKET_MAX_SIZE] =
-    {};
-uint8_t serial_communication_framework_rx_buffer[serial_communication_framework::RequestPacket::K_PACKET_MAX_SIZE] = {};
-serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64]                                        = {};
-
-serial_communication_framework::SlaveHandler protocol_handler({serial_communication_framework_tx_buffer},
-                                                              {serial_communication_framework_rx_buffer},
-                                                              {handler_buffer}, uart0_controller, 0);
+serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64] = {};
+serial_communication_framework::SlaveHandler protocol_handler({handler_buffer}, uart0_controller, 0);
 
 void uart0_putchar(char c) { uart0_controller.transmitByte(c); }
 void uart0_flush() { uart0_controller.flushTx(); }
