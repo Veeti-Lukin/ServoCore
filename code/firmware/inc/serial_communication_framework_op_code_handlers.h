@@ -5,10 +5,13 @@
 
 namespace serial_communication_framework_op_code_handlers {
 
-serial_communication_framework::ResponseData setParamValue(std::span<std::uint8_t> request_data);
-serial_communication_framework::ResponseData getParamValue(std::span<std::uint8_t> request_data);
+using serial_communication_framework::ResponseData;
 
-serial_communication_framework::ResponseData echo(std::span<std::uint8_t> request_data);
+ResponseData setParamValue(std::span<std::uint8_t> request_data);
+ResponseData getParamValue(std::span<std::uint8_t> request_data);
+
+ResponseData echo(std::span<std::uint8_t> request_data);
+ResponseData ping(std::span<std::uint8_t> request_data);
 
 }  // namespace serial_communication_framework_op_code_handlers
 
