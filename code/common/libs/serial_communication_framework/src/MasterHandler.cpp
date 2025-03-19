@@ -28,7 +28,7 @@ ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(uint8_t receiv
 
         if (rx_index == ResponsePacket::K_HEADER_SIZE) {
             ResponsePacket::Header header = deSerializeResponseHeader(rx_buffer_);
-            expected_packet_size          = header.payload_size + RequestPacket::K_HEADER_WITH_CRC_SIZE;
+            expected_packet_size          = header.payload_size + ResponsePacket::K_HEADER_WITH_CRC_SIZE;
         }
     }
 
