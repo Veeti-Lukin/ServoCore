@@ -10,9 +10,9 @@ namespace drivers::interfaces {
  * This inteface defines the basic functionality for transmitting and receiving bytes
  * over a serial connection with buffered communication support.
  */
-class SerialBufferedCommunicationInterface {
+class BufferedSerialCommunicationInterface {
 public:
-    virtual ~SerialBufferedCommunicationInterface()            = default;
+    virtual ~BufferedSerialCommunicationInterface()            = default;
 
     /**
      * @brief Transmit a single byte through the communication interface.

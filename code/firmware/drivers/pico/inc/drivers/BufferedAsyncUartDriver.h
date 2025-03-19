@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-#include "drivers/interfaces/SerialBufferedCommunicationInterface.h"
+#include "drivers/interfaces/BufferedSerialCommunicationInterface.h"
 #include "utils/RingBuffer.h"
 
 namespace drivers {
@@ -49,7 +49,7 @@ enum class Parity {
  */
 
 template <size_t tx_buffer_size, size_t rx_buffer_size>
-class BufferedAsyncUartDriver final : public interfaces::SerialBufferedCommunicationInterface {
+class BufferedAsyncUartDriver final : public interfaces::BufferedSerialCommunicationInterface {
 public:
     BufferedAsyncUartDriver(uart_inst_t* uart_instance, volatile utils::RingBuffer<tx_buffer_size>* tx_buffer,
                             volatile utils::RingBuffer<rx_buffer_size>* rx_buffer, uint32_t baud_rate,

@@ -5,7 +5,7 @@
 #include "serial_communication_framework/serialize_deserialize.h"
 
 namespace serial_communication_framework {
-MasterHandler::MasterHandler(drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface)
+MasterHandler::MasterHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface)
     : communication_interface_(communication_interface) {
     ASSERT_WITH_MESSAGE(tx_buffer_.size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE, "Too small tx_buffer");
     ASSERT_WITH_MESSAGE(rx_buffer_.size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE, "Too small rx_buffer");

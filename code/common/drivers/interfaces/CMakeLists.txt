@@ -1,5 +1,5 @@
 add_library(drivers_interfaces
-        inc/drivers/interfaces/SerialBufferedCommunicationInterface.h
+        inc/drivers/interfaces/BufferedSerialCommunicationInterface.h
         inc/drivers/interfaces/RgbLedInterface.h
 )
 

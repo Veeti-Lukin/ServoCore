@@ -7,7 +7,7 @@
 namespace serial_communication_framework {
 
 SlaveHandler::SlaveHandler(std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
-                           drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface,
+                           drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface,
                            uint8_t                                                    device_id)
     : communication_interface_(communication_interface),
       op_code_handlers_(op_code_handler_buffer),

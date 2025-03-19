@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <span>
 
-#include "drivers/interfaces/SerialBufferedCommunicationInterface.h"
+#include "drivers/interfaces/BufferedSerialCommunicationInterface.h"
 #include "serial_communication_framework/common.h"
 #include "serial_communication_framework/packets.h"
 
@@ -20,7 +20,7 @@ struct OperationCodeHandlerInfo {
 class SlaveHandler {
 public:
     explicit SlaveHandler(std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
-                          drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface,
+                          drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface,
                           uint8_t                                                    device_id);
     ~        SlaveHandler() = default;
 
@@ -34,7 +34,7 @@ private:
     uint8_t tx_buffer_[RequestPacket::K_PACKET_MAX_SIZE]  = {};
     uint8_t rx_buffer_[ResponsePacket::K_PACKET_MAX_SIZE] = {};
 
-    drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface_;
+    drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface_;
 
     std::span<OperationCodeHandlerInfo> op_code_handlers_;
     size_t                              op_code_handler_registering_index_ = 0;

@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <span>
 
-#include "drivers/interfaces/SerialBufferedCommunicationInterface.h"
+#include "drivers/interfaces/BufferedSerialCommunicationInterface.h"
 #include "serial_communication_framework/common.h"
 #include "serial_communication_framework/packets.h"
 
@@ -14,7 +14,7 @@ using AsyncCallBack = void (*)(ResponseData);
 
 class MasterHandler {
 public:
-    explicit MasterHandler(drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface);
+    explicit MasterHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface);
     ~        MasterHandler() = default;
 
     [[nodiscard]] ResponseData sendRequestAndReceiveResponseBlocking(uint8_t receiver_id, uint8_t operation_code,
@@ -28,7 +28,7 @@ private:
     uint8_t tx_buffer_[ResponsePacket::K_PACKET_MAX_SIZE] = {};
     uint8_t rx_buffer_[RequestPacket::K_PACKET_MAX_SIZE]  = {};
 
-    drivers::interfaces::SerialBufferedCommunicationInterface& communication_interface_;
+    drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface_;
 
     // TODO: queue for requests and callbacks
     AsyncCallBack next_response_cb_ = nullptr;
