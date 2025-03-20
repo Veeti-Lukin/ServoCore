@@ -31,8 +31,8 @@ public:
 private:
     OperationCodeHandler getOpcodeHandler(uint8_t op_code);
 
-    uint8_t tx_buffer_[RequestPacket::K_PACKET_MAX_SIZE]  = {};
-    uint8_t rx_buffer_[ResponsePacket::K_PACKET_MAX_SIZE] = {};
+    uint8_t tx_buffer_[ResponsePacket::K_PACKET_MAX_SIZE] = {};
+    uint8_t rx_buffer_[RequestPacket::K_PACKET_MAX_SIZE]  = {};
 
     drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface_;
 
