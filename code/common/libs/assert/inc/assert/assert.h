@@ -5,23 +5,23 @@
 
 namespace assert {
 
-#if ASSERT_LEVEL == ASSERT_LEVEL_DISABLED
+#if ServoCore_ASSERT_LEVEL == ASSERT_LEVEL_DISABLED
 #define ASSERT(expression)                        // No-op
 #define ASSERT_WITH_MESSAGE(expression, message)  // No-op
 
-#elif ASSERT_LEVEL == ASSERT_LEVEL_ENABLED
+#elif ServoCore_ASSERT_LEVEL == ASSERT_LEVEL_ENABLED
 #define ASSERT(expression) \
     if (!(expression)) assert::internal::onAssertFail()
 #define ASSERT_WITH_MESSAGE(expression, message) \
     if (!(expression)) assert::internal::onAssertFail()
 
-#elif ASSERT_LEVEL == ASSERT_LEVEL_VERBOSE
+#elif ServoCore_ASSERT_LEVEL == ASSERT_LEVEL_VERBOSE
 #define ASSERT(expression) \
     if (!(expression)) assert::internal::onAssertFail(#expression, nullptr, nullptr, -1)
 #define ASSERT_WITH_MESSAGE(expression, message) \
     if (!(expression)) assert::internal::onAssertFail(#expression, message, nullptr, -1)
 
-#elif ASSERT_LEVEL == ASSERT_LEVEL_DEBUG
+#elif ServoCore_ASSERT_LEVEL == ASSERT_LEVEL_DEBUG
 #define ASSERT(expression) \
     if (!(expression)) assert::internal::onAssertFail(#expression, nullptr, __FILE__, __LINE__)
 #define ASSERT_WITH_MESSAGE(expression, message) \

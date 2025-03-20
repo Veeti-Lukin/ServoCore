@@ -12,8 +12,10 @@ SlaveHandler::SlaveHandler(std::span<OperationCodeHandlerInfo>                  
     : communication_interface_(communication_interface),
       op_code_handlers_(op_code_handler_buffer),
       device_id_(device_id) {
-    ASSERT_WITH_MESSAGE(tx_buffer_.size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE, "Too small tx_buffer");
-    ASSERT_WITH_MESSAGE(rx_buffer_.size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE, "Too small rx_buffer");
+    ASSERT_WITH_MESSAGE(std::span<uint8_t>(tx_buffer_).size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE,
+                        "Too small tx_buffer");
+    ASSERT_WITH_MESSAGE(std::span<uint8_t>(rx_buffer_).size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE,
+                        "Too small rx_buffer");
 }
 
 void SlaveHandler::registerHandler(uint8_t op_code, OperationCodeHandler handler) {

@@ -7,8 +7,10 @@
 namespace serial_communication_framework {
 MasterHandler::MasterHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface)
     : communication_interface_(communication_interface) {
-    ASSERT_WITH_MESSAGE(tx_buffer_.size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE, "Too small tx_buffer");
-    ASSERT_WITH_MESSAGE(rx_buffer_.size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE, "Too small rx_buffer");
+    ASSERT_WITH_MESSAGE(std::span<uint8_t>(tx_buffer_).size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE,
+                        "Too small tx_buffer");
+    ASSERT_WITH_MESSAGE(std::span<uint8_t>(rx_buffer_).size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE,
+                        "Too small rx_buffer");
 }
 
 ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(uint8_t receiver_id, uint8_t operation_code,
