@@ -1,7 +1,8 @@
 
+
 #include "assert/assert.h"
 #include "debug_print/debug_print.h"
-#include "utils/break_point.h"
+#include "drivers/general/break_point.h"
 
 namespace assert::internal {
 
@@ -33,7 +34,7 @@ namespace assert::internal {
 
     if (getAssertionFailedReaction() == OnAssertFailReaction::break_point ||
         getAssertionFailedReaction() == OnAssertFailReaction::call_assertion_handler_and_break_point) {
-        while (true) utils::triggerBreakpoint();
+        while (true) drivers::general::triggerBreakpoint();
     }
 }
 
@@ -49,7 +50,7 @@ namespace assert::internal {
 
     if (getAssertionFailedReaction() == OnAssertFailReaction::break_point ||
         getAssertionFailedReaction() == OnAssertFailReaction::call_assertion_handler_and_break_point) {
-        while (true) utils::triggerBreakpoint();
+        while (true) drivers::general::triggerBreakpoint();
     }
 }
 

@@ -13,7 +13,7 @@ set_target_properties(assert PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(assert PUBLIC inc)
 
-target_link_libraries(assert PRIVATE debug_print utils)
+target_link_libraries(assert PRIVATE debug_print drivers_general)
 
 # Define assertion levels
 set(ASSERT_LEVEL_DISABLED 0)

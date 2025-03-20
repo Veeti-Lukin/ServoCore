@@ -1,7 +1,7 @@
 #ifndef BREAK_POINT_H
 #define BREAK_POINT_H
 
-namespace utils {
+namespace drivers::general {
 
 inline void volatile triggerBreakpoint() {
 #if defined(__GNUC__) || defined(__clang__)  // GCC/Clang
@@ -26,6 +26,6 @@ inline void volatile triggerBreakpoint() {
 #endif
 }
 
-}  // namespace utils
+}  // namespace drivers::general
 
 #endif  // BREAK_POINT_H
