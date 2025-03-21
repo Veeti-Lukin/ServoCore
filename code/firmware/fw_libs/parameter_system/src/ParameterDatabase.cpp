@@ -30,7 +30,7 @@ ParameterDelegateBase* ParameterDatabase::getParameterDelegateById(ParameterID i
 }
 
 ParameterDelegateBase* ParameterDatabase::getParameterDelegateByIndex(size_t index) const {
-    if (index >= param_registering_index_ - 1) {
+    if (index >= param_registering_index_) {
         return nullptr;
     }
 
