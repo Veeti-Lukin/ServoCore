@@ -3,39 +3,11 @@
 
 #include <cstdint>
 
+#include "parameter_system/definitions.h"
+
 namespace parameter_system {
 
 using ParameterOnChangeCallback = void (*)();
-using ParameterID               = uint8_t;
-
-enum class ParameterType : uint8_t {
-    uint8,
-    uint16,
-    uint32,
-    uint64,
-    int8,
-    int16,
-    int32,
-    int64,
-    floating_point,
-    double_float,
-    boolean,
-
-    none,
-};
-
-enum class ReadWriteAccess : uint8_t {
-    read_only,
-    write_only,
-    read_write,
-};
-
-struct ParameterMetaData {
-    ParameterID     id;
-    ParameterType   type;
-    ReadWriteAccess read_write_access;
-    const char*     name;
-};
 
 class ParameterDelegateBase {
 public:

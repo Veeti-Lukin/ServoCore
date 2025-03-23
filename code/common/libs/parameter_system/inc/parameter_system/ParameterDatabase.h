@@ -4,6 +4,7 @@
 #include <span>
 
 #include "parameter_system/ParameterDelegate.h"
+#include "parameter_system/definitions.h"
 #include "parameter_system/parameter_type_mappings.h"
 
 namespace parameter_system {
