@@ -1,2 +1,1 @@
 add_subdirectory(led_controller)
-add_subdirectory(parameter_system)
