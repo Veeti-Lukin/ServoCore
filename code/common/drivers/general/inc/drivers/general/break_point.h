@@ -3,6 +3,21 @@
 
 namespace drivers::general {
 
+/**
+ * @brief Triggers a breakpoint for debugging purposes.
+ *
+ * This function issues an architecture-specific breakpoint instruction,
+ * causing the debugger to halt execution at the call site.
+ * If the architecture is unsupported, the function defaults to a no-op.
+ *
+ * Supported architectures:
+ * - ARM (RP2040, STM32, etc.): Uses `bkpt #0`
+ * - x86/x86_64: Uses `int $3`
+ * - Windows (MSVC): Uses `__debugbreak()`
+ * - macOS/iOS (Clang): Uses `std::raise(SIGTRAP)`
+ *
+ * @note Ensure that a debugger is attached; otherwise, behavior may be undefined.
+ */
 inline void volatile triggerBreakpoint() {
 #if defined(__GNUC__) || defined(__clang__)  // GCC/Clang
 #if defined(__arm__) || defined(__thumb__)   // ARM (RP2040, STM32, etc.)
