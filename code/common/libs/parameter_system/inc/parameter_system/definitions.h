@@ -37,6 +37,51 @@ struct ParameterMetaData {
     const char*     name;
 };
 
+inline const char* mapParameterTypeToString(ParameterType param_type) {
+    switch (param_type) {
+        case ParameterType::uint8:
+            return "uint8";
+        case ParameterType::uint16:
+            return "uint16";
+        case ParameterType::uint32:
+            return "uint32";
+        case ParameterType::uint64:
+            return "uint64";
+        case ParameterType::int8:
+            return "int8";
+        case ParameterType::int16:
+            return "int16";
+        case ParameterType::int32:
+            return "int32";
+        case ParameterType::int64:
+            return "int64";
+        case ParameterType::floating_point:
+            return "floating_point";
+        case ParameterType::double_float:
+            return "double_float";
+        case ParameterType::boolean:
+            return "boolean";
+        case ParameterType::none:
+            return "none";
+
+        default:
+            return "unknown";
+    }
+}
+
+inline const char* mapReadWriteAccessToString(ReadWriteAccess read_write_access) {
+    switch (read_write_access) {
+        case ReadWriteAccess::read_only:
+            return "read_only";
+        case ReadWriteAccess::write_only:
+            return "write_only";
+        case ReadWriteAccess::read_write:
+            return "read_write";
+        default:
+            return "unknown";
+    }
+}
+
 }  // namespace parameter_system
 
 #endif  // COMMON_LIBS_PARAMETERSYSTEM_DEFINITIONS_H
