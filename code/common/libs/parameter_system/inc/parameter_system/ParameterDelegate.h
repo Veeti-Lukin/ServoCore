@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include "assert/assert.h"
 #include "parameter_system/definitions.h"
 
 namespace parameter_system {
@@ -19,11 +20,18 @@ public:
 template <typename T, ParameterType parameter_type>
 class ParameterDelegate final : public ParameterDelegateBase {
 public:
-    ParameterDelegate(ParameterID id, ReadWriteAccess read_write_access, const char* name, T& data_ref,
+    ParameterDelegate(ParameterID id, ReadWriteAccess read_write_access, const char name[], T& data_ref,
                       ParameterOnChangeCallback callback = nullptr)
-        : meta_data_({id, parameter_type, read_write_access, name}),
-          data_ref_(data_ref),
-          on_change_callback_(callback) {}
+        : meta_data_({id, parameter_type, read_write_access, ""}), data_ref_(data_ref), on_change_callback_(callback) {
+        // copy the name to the metadata
+        for (size_t i = 0; i < ParameterMetaData::K_PARAMETER_NAME_MAX_LENGTH; i++) {
+            meta_data_.name[i] = name[i];
+
+            if (name[i] == '\0') break;
+            if (i == ParameterMetaData::K_PARAMETER_NAME_MAX_LENGTH - 1)
+                ASSERT_WITH_MESSAGE(name[i] == '\0', "Parameter name is too long");
+        }
+    }
     ~ParameterDelegate() override = default;
 
     T getValue() const {

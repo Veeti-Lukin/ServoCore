@@ -31,10 +31,12 @@ enum class ReadWriteAccess : uint8_t {
 };
 
 struct ParameterMetaData {
+    static constexpr size_t K_PARAMETER_NAME_MAX_LENGTH = 52;
+
     ParameterID     id;
     ParameterType   type;
     ReadWriteAccess read_write_access;
-    const char*     name;
+    char            name[K_PARAMETER_NAME_MAX_LENGTH];
 };
 
 inline const char* mapParameterTypeToString(ParameterType param_type) {
