@@ -35,11 +35,14 @@ ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(uint8_t receiv
     }
 
     ResponsePacket response = deSerializeResponse(rx_buffer_);
+    communication_statistics_.total_packets_received++;
 
     if (responseHasValidCrc(response) == false) {
-        // TODO log statistics
+        communication_statistics_.corrupted_packets_received++;
         return ResponseData(ResponseCode::corrupted, {});
     }
+
+    communication_statistics_.valid_packets_received++;
 
     // TODO Resetting tx buffer and rx buffer
 
@@ -53,5 +56,7 @@ void MasterHandler::sendRequestAndReceiveResponseASync(uint8_t receiver_id, uint
 void MasterHandler::run() {
     // TODO implement
 }
+
+const CommunicationStatistics& MasterHandler::getStatistics() const { return communication_statistics_; }
 
 }  // namespace serial_communication_framework

@@ -62,12 +62,17 @@ void SlaveHandler::run() {
             return;
         }
 
+        // only increment this after te id checking
+        communication_statistics_.total_packets_received++;
+
         if (requestHasValidCrc(packet) == false) {
+            communication_statistics_.corrupted_packets_received++;
             ResponsePacket     response(static_cast<uint8_t>(ResponseCode::corrupted), {});
             std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
             communication_interface_.transmitBytes(serialized_response);
             return;
         }
+        communication_statistics_.valid_packets_received++;
 
         OperationCodeHandler op_code_handler = getOpcodeHandler(packet.header.operation_code);
 
@@ -85,6 +90,8 @@ void SlaveHandler::run() {
         // TODO Resetting tx buffer and rx buffer
     }
 }
+
+const CommunicationStatistics& SlaveHandler::getCommunicationStatistics() const { return communication_statistics_; }
 
 OperationCodeHandler SlaveHandler::getOpcodeHandler(uint8_t op_code) {
     for (OperationCodeHandlerInfo op_code_info : op_code_handlers_) {

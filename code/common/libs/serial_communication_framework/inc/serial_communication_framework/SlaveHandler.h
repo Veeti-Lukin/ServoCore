@@ -28,6 +28,8 @@ public:
 
     void run();
 
+    [[nodiscard]] const CommunicationStatistics& getCommunicationStatistics() const;
+
 private:
     OperationCodeHandler getOpcodeHandler(uint8_t op_code);
 
@@ -35,11 +37,11 @@ private:
     uint8_t rx_buffer_[RequestPacket::K_PACKET_MAX_SIZE]  = {};
 
     drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface_;
+    CommunicationStatistics                                    communication_statistics_;
+    uint8_t                                                    device_id_;
 
     std::span<OperationCodeHandlerInfo> op_code_handlers_;
     size_t                              op_code_handler_registering_index_ = 0;
-
-    uint8_t device_id_;
 };
 
 }  // namespace serial_communication_framework
