@@ -48,17 +48,24 @@ void SlaveHandler::run() {
 
         RequestPacket packet = deSerializeRequest(rx_buffer_);
 
-        if (requestHasValidCrc(packet) == false) {
-            // TODO log statistics
-            ResponsePacket     response(static_cast<uint8_t>(ResponseCode::corrupted), {});
-            std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
-            communication_interface_.transmitBytes(serialized_response);
-            return;
-        }
+        // TODO which way around should this be check the crc first or the id
+        // if id then if tha packet is still corrupted and the id field is faulty this device might conflict with the
+        // device the packet was meant for if it gets the packet correctly
+        // if crc first and the packet is corrupted the the packet might be for some other device and the if it gets the
+        // packet correctly same issue happens
+
+        // This way it is really unlikely that even if the packet is corrupted te id of the packet would be device id
 
         // Check if the packet is for this device or not
         // If not, do not do anything with the packet
         if (packet.header.receiver_id != device_id_) {
+            return;
+        }
+
+        if (requestHasValidCrc(packet) == false) {
+            ResponsePacket     response(static_cast<uint8_t>(ResponseCode::corrupted), {});
+            std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
+            communication_interface_.transmitBytes(serialized_response);
             return;
         }
 
