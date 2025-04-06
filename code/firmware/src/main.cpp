@@ -17,6 +17,7 @@
 #include "led_controller/common_colors.h"
 #include "parameter_system/ParameterDatabase.h"
 #include "parameter_system/ParameterDelegate.h"
+#include "protocol/commands.h"
 #include "serial_communication_framework/SlaveHandler.h"
 #include "serial_communication_framework/packets.h"
 #include "serial_communication_framework_op_code_handlers.h"
@@ -52,7 +53,7 @@ parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
 
 // ----------------------------- COMM PROTOCOL --------------------------------
 serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64] = {};
-serial_communication_framework::SlaveHandler protocol_handler({handler_buffer}, uart0_controller, 0);
+serial_communication_framework::SlaveHandler             protocol_handler({handler_buffer}, uart0_controller, 0);
 
 void uart0_putchar(char c) { uart0_controller.transmitByte(c); }
 void uart0_flush() { uart0_controller.flushTx(); }
@@ -115,7 +116,12 @@ int main() {
     DEBUG_PRINT("Starting up!\n");
 
     protocol_handler.registerHandler(1, serial_communication_framework_op_code_handlers::echo);
-
+    protocol_handler.registerHandler(static_cast<uint8_t>(protocol::BasicCommands::ping),
+                                     serial_communication_framework_op_code_handlers::ping);
+    protocol_handler.registerHandler(static_cast<uint8_t>(protocol::ParameterCommands::get_ids),
+                                     serial_communication_framework_op_code_handlers::getParamIds);
+    protocol_handler.registerHandler(static_cast<uint8_t>(protocol::ParameterCommands::get_metadata),
+                                     serial_communication_framework_op_code_handlers::getParamMetaData);
     uint8_t  test_uint8  = 42;
     uint16_t test_uint16 = 1337;
     uint32_t test_uint32 = 123456;

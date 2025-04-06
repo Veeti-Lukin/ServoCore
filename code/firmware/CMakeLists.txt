@@ -26,6 +26,7 @@ target_link_libraries(ServoCore_firmware PUBLIC
         parameter_system
         serial_communication_framework
         assert
+        protocol
 )
 
 pico_add_extra_outputs(ServoCore_firmware)
