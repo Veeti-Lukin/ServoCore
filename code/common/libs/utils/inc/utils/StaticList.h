@@ -1,6 +1,7 @@
 #ifndef COMMON_LIBS_UTILS_STATICLIST_H
 #define COMMON_LIBS_UTILS_STATICLIST_H
 
+#include <initializer_list>
 #include <memory>
 #include <utility>
 
@@ -19,8 +20,15 @@ namespace utils {
 template <typename T, size_t N>
 class StaticList {
 public:
-     StaticList() = default;
-    ~StaticList() = default;
+                StaticList()                  = default;
+    ~           StaticList()                  = default;
+                StaticList(const StaticList&) = default;
+                StaticList(StaticList&&)      = default;
+    StaticList& operator=(const StaticList&)  = default;
+    StaticList& operator=(StaticList&&)       = default;
+
+    StaticList(std::initializer_list<T> init);
+    StaticList(std::span<T> init);
 
     /* ######################## Element access ######################## */
     /**
@@ -162,6 +170,20 @@ private:
 //
 
 /// ------------------------ DEFINITIONS --------------------------------------
+
+template <typename T, size_t N>
+StaticList<T, N>::StaticList(std::initializer_list<T> init) {
+    ASSERT(init.size() <= N);
+    size_ = init.size();
+    std::copy(init.begin(), init.end(), data_);
+}
+
+template <typename T, size_t N>
+StaticList<T, N>::StaticList(std::span<T> init) {
+    ASSERT(init.size() <= N);
+    size_ = init.size();
+    std::copy(init.begin(), init.end(), data_);
+}
 
 template <typename T, size_t N>
 T& StaticList<T, N>::operator[](size_t index) {
