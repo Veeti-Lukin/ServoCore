@@ -14,7 +14,7 @@ std::optional<Device> Context::tryFindDeviceById(uint8_t id) {
     using serial_communication_framework::ResponseData;
 
     ResponseData response = communication_handler.sendRequestAndReceiveResponseBlocking(
-        id, static_cast<uint8_t>(protocol::BasicCommands::ping), {});
+        id, static_cast<uint8_t>(protocol::Commands::ping), {});
 
     if (response.response_code != ResponseCode::ok) {  // TODO what if the result is "corrupted"?
         // Return empty std::optional

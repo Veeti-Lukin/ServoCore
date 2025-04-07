@@ -18,9 +18,9 @@
 #include "parameter_system/ParameterDatabase.h"
 #include "parameter_system/ParameterDelegate.h"
 #include "protocol/commands.h"
+#include "protocol/requests.h"
+#include "protocol_handlers.h"
 #include "serial_communication_framework/SlaveHandler.h"
-#include "serial_communication_framework/packets.h"
-#include "serial_communication_framework_op_code_handlers.h"
 #include "utils/RingBuffer.h"
 
 #define UART_ID   uart0
@@ -107,6 +107,12 @@ void initHW() {
 void initSWLibs() {
     debug_print::connectPutCharAndFlushFunctions(&uart0_putchar, &uart0_flush);
     assert::setAssertionFailedReaction(assert::OnAssertFailReaction::call_assertion_handler_and_break_point);
+
+    protocol_handler.registerHandler(static_cast<uint8_t>(protocol::Commands::ping), protocol_handlers::ping);
+    protocol_handler.registerHandler(protocol::requests::GetRegisteredParameterIds::op_code,
+                                     protocol_handlers::getParamIds);
+    protocol_handler.registerHandler(protocol::requests::GetParameterMetaData::op_code,
+                                     protocol_handlers::getParamMetaData);
 }
 
 int main() {
@@ -115,13 +121,6 @@ int main() {
 
     DEBUG_PRINT("Starting up!\n");
 
-    protocol_handler.registerHandler(1, serial_communication_framework_op_code_handlers::echo);
-    protocol_handler.registerHandler(static_cast<uint8_t>(protocol::BasicCommands::ping),
-                                     serial_communication_framework_op_code_handlers::ping);
-    protocol_handler.registerHandler(static_cast<uint8_t>(protocol::ParameterCommands::get_ids),
-                                     serial_communication_framework_op_code_handlers::getParamIds);
-    protocol_handler.registerHandler(static_cast<uint8_t>(protocol::ParameterCommands::get_metadata),
-                                     serial_communication_framework_op_code_handlers::getParamMetaData);
     uint8_t  test_uint8  = 42;
     uint16_t test_uint16 = 1337;
     uint32_t test_uint32 = 123456;

@@ -1,6 +1,9 @@
 #ifndef MASTER_SLAVE_COMMON_H
 #define MASTER_SLAVE_COMMON_H
 
+#include "packets.h"
+#include "utils/StaticList.h"
+
 namespace serial_communication_framework {
 
 enum class ResponseCode : uint8_t {
@@ -8,13 +11,14 @@ enum class ResponseCode : uint8_t {
 
     unknown_operation_code,
     invalid_arguments,
+    payload_missing_parts,
     timed_out,
     corrupted,  // crc matching failed
 };
 
 struct ResponseData {
-    ResponseCode       response_code;
-    std::span<uint8_t> response_data;
+    ResponseCode                                                   response_code;
+    utils::StaticList<uint8_t, ResponsePacket::K_PAYLOAD_MAX_SIZE> response_data;
 };
 
 struct CommunicationStatistics {

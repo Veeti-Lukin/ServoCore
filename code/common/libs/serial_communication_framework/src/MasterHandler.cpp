@@ -3,6 +3,7 @@
 #include "assert/assert.h"
 #include "serial_communication_framework/packets.h"
 #include "serial_communication_framework/serialize_deserialize.h"
+#include "utils/StaticList.h"
 
 namespace serial_communication_framework {
 MasterHandler::MasterHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface)
@@ -13,8 +14,9 @@ MasterHandler::MasterHandler(drivers::interfaces::BufferedSerialCommunicationInt
                         "Too small rx_buffer");
 }
 
-ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(uint8_t receiver_id, uint8_t operation_code,
-                                                                  std::span<uint8_t> payload) {
+ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(
+    uint8_t receiver_id, uint8_t operation_code,
+    utils::StaticList<uint8_t, RequestPacket::K_PAYLOAD_MAX_SIZE> payload) {
     RequestPacket      request(receiver_id, operation_code, payload);
     std::span<uint8_t> serialized_request = serializeRequest(request, tx_buffer_);
     communication_interface_.transmitBytes(serialized_request);
@@ -46,7 +48,8 @@ ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(uint8_t receiv
 
     // TODO Resetting tx buffer and rx buffer
 
-    return ResponseData{static_cast<ResponseCode>(response.header.response_code), response.payload};
+    return ResponseData{static_cast<ResponseCode>(response.header.response_code),
+                        utils::StaticList<uint8_t, ResponsePacket::K_PAYLOAD_MAX_SIZE>(response.payload)};
 }
 
 void MasterHandler::sendRequestAndReceiveResponseASync(uint8_t receiver_id, uint8_t operation_code,

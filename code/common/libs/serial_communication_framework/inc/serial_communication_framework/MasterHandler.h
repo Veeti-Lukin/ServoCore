@@ -7,6 +7,7 @@
 #include "drivers/interfaces/BufferedSerialCommunicationInterface.h"
 #include "serial_communication_framework/common.h"
 #include "serial_communication_framework/packets.h"
+#include "utils/StaticList.h"
 
 namespace serial_communication_framework {
 
@@ -17,8 +18,9 @@ public:
     explicit MasterHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface);
     ~        MasterHandler() = default;
 
-    [[nodiscard]] ResponseData sendRequestAndReceiveResponseBlocking(uint8_t receiver_id, uint8_t operation_code,
-                                                                     std::span<uint8_t> payload);
+    [[nodiscard]] ResponseData sendRequestAndReceiveResponseBlocking(
+        uint8_t receiver_id, uint8_t operation_code,
+        utils::StaticList<uint8_t, RequestPacket::K_PAYLOAD_MAX_SIZE> payload);
     void sendRequestAndReceiveResponseASync(uint8_t receiver_id, uint8_t operation_code, std::span<uint8_t> payload,
                                             AsyncCallBack cb);
 

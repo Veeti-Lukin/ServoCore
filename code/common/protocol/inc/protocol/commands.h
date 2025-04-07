@@ -3,17 +3,12 @@
 
 #include <cstdint>
 
+#include "protocol/operation_codes.h"
+
 namespace protocol {
 
-enum class BasicCommands : uint8_t {
-    ping = 0,
-};
-
-enum class ParameterCommands : uint8_t {
-    write,
-    read,
-    get_metadata,
-    get_ids,
+enum class Commands : uint8_t {
+    ping = static_cast<uint8_t>(OperationCodes::ping),
 };
 
 }  // namespace protocol

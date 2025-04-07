@@ -17,4 +17,4 @@ set_target_properties(serial_communication_framework PROPERTIES LINKER_LANGUAGE 
 
 target_include_directories(serial_communication_framework PUBLIC inc)
 
-target_link_libraries(serial_communication_framework PRIVATE drivers_interfaces assert)
+target_link_libraries(serial_communication_framework PRIVATE drivers_interfaces assert utils)

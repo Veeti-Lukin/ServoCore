@@ -3,7 +3,7 @@
 #include <cstring>
 
 #include "parameter_system/definitions.h"
-#include "protocol/commands.h"
+#include "protocol/requests.h"
 
 namespace servo_core_control_api {
 Device::~Device() {}
@@ -17,17 +17,15 @@ utils::StaticList<uint8_t, 255> Device::getRegisteredParameterIds() {
     using serial_communication_framework::ResponseData;
 
     ResponseData response = communication_handler_->sendRequestAndReceiveResponseBlocking(
-        device_id_, static_cast<uint8_t>(protocol::ParameterCommands::get_ids), {});
+        device_id_, protocol::requests::GetRegisteredParameterIds::op_code,
+        protocol::requests::GetRegisteredParameterIds::RequestPayload().serialize());
 
     if (response.response_code != ResponseCode::ok) {
         return {};
     }
 
-    utils::StaticList<uint8_t, 255> ids;
-    for (uint8_t id : response.response_data) {
-        ids.pushBack(id);
-    }
-    return ids;
+    return protocol::requests::GetRegisteredParameterIds::ResponsePayload(response.response_data)
+        .registered_parameter_ids;
 }
 
 ParameterMetaData Device::getParameterMetaData(uint8_t id) {
@@ -35,22 +33,14 @@ ParameterMetaData Device::getParameterMetaData(uint8_t id) {
     using serial_communication_framework::ResponseData;
 
     ResponseData response = communication_handler_->sendRequestAndReceiveResponseBlocking(
-        device_id_, static_cast<uint8_t>(protocol::ParameterCommands::get_metadata), {&id, 1});
+        device_id_, protocol::requests::GetParameterMetaData::op_code,
+        protocol::requests::GetParameterMetaData::RequestPayload(id).serialize());
+
     if (response.response_code != ResponseCode::ok) {
         return {};
     }
 
-    ParameterMetaData meta_data;
-    meta_data.id                = response.response_data[0];
-    meta_data.type              = static_cast<parameter_system::ParameterType>(response.response_data[1]);
-    meta_data.read_write_access = static_cast<parameter_system::ReadWriteAccess>(response.response_data[2]);
-
-    size_t   name_length        = response.response_data.size_bytes() - 3;
-    uint8_t* name_start         = response.response_data.data() + 3;
-    // copy the name to the metadata from the packet
-    std::memcpy(meta_data.name, name_start, name_length);
-
-    return meta_data;
+    return protocol::requests::GetParameterMetaData::ResponsePayload(response.response_data).meta_data;
 }
 
 Device::Device(uint8_t id, serial_communication_framework::MasterHandler& communication_handler)

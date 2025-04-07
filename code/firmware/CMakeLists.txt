@@ -10,8 +10,8 @@ add_executable(ServoCore_firmware
 
         inc/hw_mappings.h
 
-        inc/serial_communication_framework_op_code_handlers.h
-        src/serial_communication_framework_op_code_handlers.cpp
+        inc/protocol_handlers.h
+        src/protocol_handlers.cpp
 )
 
 target_include_directories(ServoCore_firmware PRIVATE inc)
