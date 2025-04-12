@@ -55,11 +55,11 @@ auto ParameterDatabase::getParameterDelegateByIdAs(const ParameterID id) const {
 
     // Check if the stored type matches the requested type
     if (parameter_delegate->getMetaData()->type == parameter_type) {
-        return static_cast<ParameterDelegate<typename ParameterTypeMapping<parameter_type>::type, parameter_type>*>(
+        return static_cast<ParameterDelegate<typename MapParameterTypeToCppType<parameter_type>::type, parameter_type>*>(
             parameter_delegate);
     }
 
-    return static_cast<ParameterDelegate<typename ParameterTypeMapping<parameter_type>::type, parameter_type>*>(
+    return static_cast<ParameterDelegate<typename MapParameterTypeToCppType<parameter_type>::type, parameter_type>*>(
         nullptr);
 }
 
@@ -69,11 +69,11 @@ auto ParameterDatabase::getParameterDelegateByIndexAs(const size_t index) const 
 
     // Check if the stored type matches the requested type
     if (parameter_delegate->getMetaData()->type == parameter_type) {
-        return static_cast<ParameterDelegate<typename ParameterTypeMapping<parameter_type>::type, parameter_type>*>(
+        return static_cast<ParameterDelegate<typename MapParameterTypeToCppType<parameter_type>::type, parameter_type>*>(
             parameter_delegate);
     }
 
-    return static_cast<ParameterDelegate<typename ParameterTypeMapping<parameter_type>::type, parameter_type>*>(
+    return static_cast<ParameterDelegate<typename MapParameterTypeToCppType<parameter_type>::type, parameter_type>*>(
         nullptr);
 }
 
