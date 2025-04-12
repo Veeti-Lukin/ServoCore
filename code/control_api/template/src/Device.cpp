@@ -12,7 +12,7 @@ void Device::executeCommand() {}
 
 uint8_t Device::getId() { return device_id_; }
 
-utils::StaticList<uint8_t, 255> Device::getRegisteredParameterIds() {
+utils::StaticList<ParameterID, parameter_system::K_MAX_PARAMETER_ID> Device::getRegisteredParameterIds() {
     using serial_communication_framework::ResponseCode;
     using serial_communication_framework::ResponseData;
 
@@ -28,7 +28,7 @@ utils::StaticList<uint8_t, 255> Device::getRegisteredParameterIds() {
         .registered_parameter_ids;
 }
 
-ParameterMetaData Device::getParameterMetaData(uint8_t id) {
+ParameterMetaData Device::getParameterMetaData(ParameterID id) {
     using serial_communication_framework::ResponseCode;
     using serial_communication_framework::ResponseData;
 
@@ -37,6 +37,7 @@ ParameterMetaData Device::getParameterMetaData(uint8_t id) {
         protocol::requests::GetParameterMetaData::RequestPayload(id).serialize());
 
     if (response.response_code != ResponseCode::ok) {
+        switch (response.response_code) {}
         return {};
     }
 

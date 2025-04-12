@@ -18,11 +18,36 @@ add_executable(ServoCore_dev_tool
         inc/MainWindow.h
         src/MainWindow.cpp
         ui/MainWindow.ui
+
+        inc/helpers.h
+        src/helpers.cpp
+
+        src/DeviceControlWidget.cpp
+        inc/DeviceControlWidget.h
+        ui/DeviceControlWidget.ui
+
+        # ------ PARAMETER TABLE ------
+        inc/parameter_table/common.h
+
+        inc/parameter_table/ParameterTableWidget.h
+        src/parameter_table/ParameterTableWidget.cpp
+        ui/ParameterTableWidget.ui
+
+        inc/parameter_table/ParameterTableModel.h
+        src/parameter_table/ParameterTableModel.cpp
+
+        inc/parameter_table/ParameterValueDelegate.h
+        src/parameter_table/ParameterValueDelegate.cpp
+        # ------ ---------------- ------
+
 )
 
 target_include_directories(ServoCore_dev_tool PRIVATE inc ui)
 target_link_libraries(ServoCore_dev_tool PUBLIC
-        Qt6::Core Qt6::Widgets
+        Qt6::Core
+        Qt6::Widgets
+        Qt6::SerialPort
+        control_api_windows
 )
 
 #-----------------------------------------------------------------------------

@@ -11,6 +11,8 @@ namespace servo_core_control_api {
 
 using ParameterMetaData = parameter_system::ParameterMetaData;
 
+using ParameterID       = parameter_system::ParameterID;
+
 // Forward declaration
 class Context;
 
@@ -23,9 +25,9 @@ public:
     void    executeCommand();
     uint8_t getId();
 
-    utils::StaticList<uint8_t, parameter_system::K_MAX_PARAMETER_ID> getRegisteredParameterIds();
-
-    ParameterMetaData getParameterMetaData(uint8_t id);
+    utils::StaticList<ParameterID, parameter_system::K_MAX_PARAMETER_ID> getRegisteredParameterIds();
+    ParameterMetaData                                                    getParameterMetaData(ParameterID id);
+    bool                                                                 readParameterValue(ParameterID id);
 
     static constexpr size_t K_MAX_DEVICE_ID = std::numeric_limits<uint8_t>::max();
 
