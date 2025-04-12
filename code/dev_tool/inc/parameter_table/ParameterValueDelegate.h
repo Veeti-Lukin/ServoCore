@@ -4,7 +4,7 @@
 #include <QStyledItemDelegate>
 
 #include "common.h"
-#include "parameter_system/ParameterDelegate.h"
+#include "parameter_system/parameter_definitions.h"
 
 namespace parameter_table {
 

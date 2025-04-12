@@ -1,7 +1,5 @@
 #include "protocol_handlers.h"
 
-#include <sys/stat.h>
-
 #include <cstring>
 
 #include "parameter_system/ParameterDatabase.h"
@@ -20,8 +18,9 @@ ResponseData getParamIds(std::span<std::uint8_t> request_data) {
     protocol::requests::GetRegisteredParameterIds::ResponsePayload response_payload;
 
     for (size_t i = 0; i < parameter_database.getAmountOfRegisteredParameters(); i++) {
-        parameter_system::ParameterDelegateBase* param_delegate = parameter_database.getParameterDelegateByIndex(i);
-        response_payload.registered_parameter_ids.pushBack(param_delegate->getMetaData()->id);
+        parameter_system::AbstractParameterDefinition* param_delegate =
+            parameter_database.getParameterDelegateByIndex(i);
+        response_payload.registered_parameter_ids.pushBack(param_delegate->getMetaData().id);
     }
 
     return {.response_code = serial_communication_framework::ResponseCode::ok,
@@ -34,7 +33,7 @@ ResponseData getParamMetaData(std::span<std::uint8_t> request_data) {
 
     protocol::requests::GetParameterMetaData::RequestPayload request(request_data);
 
-    parameter_system::ParameterDelegateBase* param_delegate =
+    parameter_system::AbstractParameterDefinition* param_delegate =
         parameter_database.getParameterDelegateById(request.parameter_id);
 
     // Parameter not found
@@ -42,11 +41,11 @@ ResponseData getParamMetaData(std::span<std::uint8_t> request_data) {
         return {.response_code = serial_communication_framework::ResponseCode::invalid_arguments, .response_data = {}};
     }
 
-    const parameter_system::ParameterMetaData* parameter_meta_data = param_delegate->getMetaData();
+    const parameter_system::ParameterMetaData parameter_meta_data = param_delegate->getMetaData();
 
     return {
         .response_code = serial_communication_framework::ResponseCode::ok,
-        .response_data = protocol::requests::GetParameterMetaData::ResponsePayload(*parameter_meta_data).serialize()};
+        .response_data = protocol::requests::GetParameterMetaData::ResponsePayload(parameter_meta_data).serialize()};
 }
 
 ResponseData setParamValue(std::span<std::uint8_t> request_data) { return {}; }
