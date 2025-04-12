@@ -1,6 +1,7 @@
 #ifndef COMMON_LIBS_PARAMETERSYSTEM_DEFINITIONS_H
 #define COMMON_LIBS_PARAMETERSYSTEM_DEFINITIONS_H
 
+#include <cstdint>
 #include <limits>
 
 namespace parameter_system {
@@ -19,10 +20,18 @@ enum class ParameterType : uint8_t {
     int64,
     floating_point,
     double_float,
+
+    FIRST_NUMERIC = uint8,
+    LAST_NUMERIC  = double_float,
+
     boolean,
 
     none,
 };
+
+constexpr bool paramTypeIsNumeric(ParameterType type) {
+    return type >= ParameterType::FIRST_NUMERIC && type <= ParameterType::LAST_NUMERIC;
+}
 
 enum class ReadWriteAccess : uint8_t {
     read_only,
