@@ -2,10 +2,10 @@ add_library(parameter_system STATIC
         inc/parameter_system/ParameterDatabase.h
         src/ParameterDatabase.cpp
 
-        inc/parameter_system/ParameterDelegate.h
+        inc/parameter_system/parameter_definitions.h
 
         inc/parameter_system/parameter_type_mappings.h
-        
+
         inc/parameter_system/definitions.h
 )
 

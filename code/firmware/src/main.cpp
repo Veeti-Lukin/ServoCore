@@ -16,7 +16,7 @@
 #include "led_controller/LedController.h"
 #include "led_controller/common_colors.h"
 #include "parameter_system/ParameterDatabase.h"
-#include "parameter_system/ParameterDelegate.h"
+#include "parameter_system/parameter_definitions.h"
 #include "protocol/commands.h"
 #include "protocol/requests.h"
 #include "protocol_handlers.h"
@@ -48,8 +48,8 @@ led_controller::LedController status_led_controller(&led_driver);
 repeating_timer               timer;
 
 // ----------------------------- PARAMETER SYSTEM ------------------------------
-parameter_system::ParameterDelegateBase* parameter_buffer[64] = {nullptr};
-parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
+parameter_system::AbstractParameterDefinition* parameter_buffer[64] = {nullptr};
+parameter_system::ParameterDatabase            parameter_database({parameter_buffer});
 
 // ----------------------------- COMM PROTOCOL --------------------------------
 serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64] = {};
@@ -140,76 +140,76 @@ int main() {
     parameter_database.registerParameter(&param4);
     parameter_database.registerParameter(&param5);
 
-    for (parameter_system::ParameterDelegateBase* parameter : parameter_database.getParameterDelegates()) {
-        const parameter_system::ParameterMetaData* meta_data = parameter->getMetaData();
-        DEBUG_PRINT("ID: % Name: % RW: % TYPE: % ", meta_data->id, meta_data->name,
-                    (uint8_t)meta_data->read_write_access, (uint8_t)meta_data->type);
-        switch (meta_data->type) {
+    for (parameter_system::AbstractParameterDefinition* parameter : parameter_database.getParameterDelegates()) {
+        const parameter_system::ParameterMetaData meta_data = parameter->getMetaData();
+        DEBUG_PRINT("ID: % Name: % RW: % TYPE: % ", meta_data.id, meta_data.name, (uint8_t)meta_data.read_write_access,
+                    (uint8_t)meta_data.type);
+        switch (meta_data.type) {
             case parameter_system::ParameterType::uint8:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDelegateByIdAs<parameter_system::ParameterType::uint8>(meta_data->id)
-                                ->getValue());
+                DEBUG_PRINT(
+                    "Value: %",
+                    parameter_database.getParameterDelegateByIdAs<parameter_system::ParameterType::uint8>(meta_data.id)
+                        ->getValue());
                 break;
             case parameter_system::ParameterType::uint16:
                 DEBUG_PRINT("Value: %",
                             parameter_database
-                                .getParameterDelegateByIdAs<parameter_system::ParameterType::uint16>(meta_data->id)
+                                .getParameterDelegateByIdAs<parameter_system::ParameterType::uint16>(meta_data.id)
                                 ->getValue());
                 break;
             case parameter_system::ParameterType::uint32:
                 DEBUG_PRINT("Value: %",
                             parameter_database
-                                .getParameterDelegateByIdAs<parameter_system::ParameterType::uint32>(meta_data->id)
+                                .getParameterDelegateByIdAs<parameter_system::ParameterType::uint32>(meta_data.id)
                                 ->getValue());
                 break;
             case parameter_system::ParameterType::uint64:
                 DEBUG_PRINT("Value: %",
                             parameter_database
-                                .getParameterDelegateByIdAs<parameter_system::ParameterType::uint32>(meta_data->id)
+                                .getParameterDelegateByIdAs<parameter_system::ParameterType::uint32>(meta_data.id)
                                 ->getValue());
                 break;
             case parameter_system::ParameterType::int8:
                 DEBUG_PRINT(
                     "Value: %",
-                    parameter_database.getParameterDelegateByIdAs<parameter_system::ParameterType::int8>(meta_data->id)
+                    parameter_database.getParameterDelegateByIdAs<parameter_system::ParameterType::int8>(meta_data.id)
                         ->getValue());
                 break;
             case parameter_system::ParameterType::int16:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDelegateByIdAs<parameter_system::ParameterType::int16>(meta_data->id)
-                                ->getValue());
+                DEBUG_PRINT(
+                    "Value: %",
+                    parameter_database.getParameterDelegateByIdAs<parameter_system::ParameterType::int16>(meta_data.id)
+                        ->getValue());
                 break;
             case parameter_system::ParameterType::int32:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDelegateByIdAs<parameter_system::ParameterType::int32>(meta_data->id)
-                                ->getValue());
+                DEBUG_PRINT(
+                    "Value: %",
+                    parameter_database.getParameterDelegateByIdAs<parameter_system::ParameterType::int32>(meta_data.id)
+                        ->getValue());
                 break;
             case parameter_system::ParameterType::int64:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDelegateByIdAs<parameter_system::ParameterType::int64>(meta_data->id)
-                                ->getValue());
+                DEBUG_PRINT(
+                    "Value: %",
+                    parameter_database.getParameterDelegateByIdAs<parameter_system::ParameterType::int64>(meta_data.id)
+                        ->getValue());
                 break;
             case parameter_system::ParameterType::floating_point:
                 DEBUG_PRINT(
                     "Value: %",
                     parameter_database
-                        .getParameterDelegateByIdAs<parameter_system::ParameterType::floating_point>(meta_data->id)
+                        .getParameterDelegateByIdAs<parameter_system::ParameterType::floating_point>(meta_data.id)
                         ->getValue());
                 break;
             case parameter_system::ParameterType::double_float:
-                DEBUG_PRINT("Value: %", parameter_database
-                                            .getParameterDelegateByIdAs<parameter_system::ParameterType::double_float>(
-                                                meta_data->id)
-                                            ->getValue());
+                DEBUG_PRINT("Value: %",
+                            parameter_database
+                                .getParameterDelegateByIdAs<parameter_system::ParameterType::double_float>(meta_data.id)
+                                ->getValue());
                 break;
             case parameter_system::ParameterType::boolean:
                 DEBUG_PRINT("Value: %",
                             parameter_database
-                                .getParameterDelegateByIdAs<parameter_system::ParameterType::boolean>(meta_data->id)
+                                .getParameterDelegateByIdAs<parameter_system::ParameterType::boolean>(meta_data.id)
                                 ->getValue());
             default:
                 break;
