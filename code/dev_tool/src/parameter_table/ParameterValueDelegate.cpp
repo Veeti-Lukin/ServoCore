@@ -45,9 +45,9 @@ QWidget* ParameterValueDelegate::createEditor(QWidget* parent, const QStyleOptio
         case parameter_system::ParameterType::floating_point:
         case parameter_system::ParameterType::double_float: {
             QDoubleSpinBox* editor = new QDoubleSpinBox(parent);
-            editor->setMinimum(std::numeric_limits<parameter_system::ParameterTypeMapping<
+            editor->setMinimum(std::numeric_limits<parameter_system::MapParameterTypeToCppType<
                                    parameter_system::ParameterType::double_float>::type>::min());
-            editor->setMaximum(std::numeric_limits<parameter_system::ParameterTypeMapping<
+            editor->setMaximum(std::numeric_limits<parameter_system::MapParameterTypeToCppType<
                                    parameter_system::ParameterType::double_float>::type>::max());
             editor->setFrame(false);
             return editor;
