@@ -4,6 +4,7 @@ add_library(protocol
         inc/protocol/parameter_ids.h
         inc/protocol/requests.h
         src/requests.cpp
+        inc/protocol/parameters.h
 )
 
 set_target_properties(protocol PROPERTIES LINKER_LANGUAGE CXX)

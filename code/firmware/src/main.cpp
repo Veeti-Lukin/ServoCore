@@ -18,6 +18,7 @@
 #include "parameter_system/ParameterDatabase.h"
 #include "parameter_system/parameter_definitions.h"
 #include "protocol/commands.h"
+#include "protocol/parameters.h"
 #include "protocol/requests.h"
 #include "protocol_handlers.h"
 #include "serial_communication_framework/SlaveHandler.h"
@@ -127,12 +128,16 @@ int main() {
     float    test_float  = 3.1415;
     bool     test_bool   = true;
 
-    parameter_system::ParamUint8  param1(0x2, parameter_system::ReadWriteAccess::read_write, "Test Uint8", test_uint8);
-    parameter_system::ParamUint16 param2(0x3, parameter_system::ReadWriteAccess::read_only, "Test Uint16", test_uint16);
-    parameter_system::ParamUint32 param3(0x4, parameter_system::ReadWriteAccess::read_write, "Test Uint32",
-                                         test_uint32);
-    parameter_system::ParamFloat  param4(0x5, parameter_system::ReadWriteAccess::read_only, "Test Float", test_float);
-    parameter_system::ParamBoolean param5(0x6, parameter_system::ReadWriteAccess::read_write, "Test Bool", test_bool);
+    parameter_system::ParamUint8  param1(protocol::test_params::test_uint8,
+                                         parameter_system::ReadWriteAccess::read_write, "Test Uint8", test_uint8);
+    parameter_system::ParamUint16 param2(protocol::test_params::test_uint16,
+                                         parameter_system::ReadWriteAccess::read_only, "Test Uint16", test_uint16);
+    parameter_system::ParamUint32 param3(protocol::test_params::test_uint32,
+                                         parameter_system::ReadWriteAccess::read_write, "Test Uint32", test_uint32);
+    parameter_system::ParamFloat param4(protocol::test_params::test_float, parameter_system::ReadWriteAccess::read_only,
+                                        "Test Float", test_float);
+    parameter_system::ParamBoolean param5(protocol::test_params::test_bool,
+                                          parameter_system::ReadWriteAccess::read_write, "Test Bool", test_bool);
 
     parameter_database.registerParameter(&param1);
     parameter_database.registerParameter(&param2);

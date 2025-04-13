@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "assert/assert.h"
+#include "parameter_system/ParameterDeclaration.h"
 #include "parameter_system/definitions.h"
 #include "parameter_system/parameter_type_mappings.h"
 
@@ -88,9 +89,10 @@ class NumericParameterDefinition final : public AbstractNumericParameterDefiniti
 public:
     using T = typename MapParameterTypeToCppType<T_ParameterType>::type;
 
-    NumericParameterDefinition(ParameterID id, ReadWriteAccess read_write_access, const char name[], T& data_ref,
-                               ParameterOnChangeCallback on_change_cb = nullptr)
-        : AbstractNumericParameterDefinition(id, read_write_access, name, T_ParameterType, &data_ref, on_change_cb) {}
+    NumericParameterDefinition(ParameterDeclaration<T_ParameterType> declaration, ReadWriteAccess read_write_access,
+                               const char name[], T& data_ref, ParameterOnChangeCallback on_change_cb = nullptr)
+        : AbstractNumericParameterDefinition(declaration.id, read_write_access, name, T_ParameterType, &data_ref,
+                                             on_change_cb) {}
 
     ~NumericParameterDefinition() override = default;
 
@@ -154,9 +156,11 @@ class BooleanParameterDefinition final : public AbstractParameterDefinition {
 public:
     using T = MapParameterTypeToCppType<ParameterType::boolean>::type;
 
-    BooleanParameterDefinition(ParameterID id, ReadWriteAccess read_write_access, const char name[], bool& data_ref,
+    BooleanParameterDefinition(ParameterDeclaration<ParameterType::boolean> declaration,
+                               ReadWriteAccess read_write_access, const char name[], bool& data_ref,
                                ParameterOnChangeCallback on_change_cb = nullptr)
-        : AbstractParameterDefinition(id, read_write_access, name, ParameterType::boolean, &data_ref, on_change_cb) {}
+        : AbstractParameterDefinition(declaration.id, read_write_access, name, ParameterType::boolean, &data_ref,
+                                      on_change_cb) {}
     ~BooleanParameterDefinition() override = default;
 
     [[nodiscard]] T getValue() const {
