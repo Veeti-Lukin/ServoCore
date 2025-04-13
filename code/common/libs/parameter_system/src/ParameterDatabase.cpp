@@ -9,7 +9,7 @@ void ParameterDatabase::registerParameter(AbstractParameterDefinition* parameter
     ASSERT(parameter_delegate != nullptr);
     ASSERT_WITH_MESSAGE(param_registering_index_ < buffer_.size(),
                         "Parameter registering index out of bounds. Buffer too small");
-    ASSERT_WITH_MESSAGE(getParameterDelegateById(parameter_delegate->getMetaData().id) == nullptr,
+    ASSERT_WITH_MESSAGE(getParameterDefinitionById(parameter_delegate->getMetaData().id) == nullptr,
                         "Parameter already registered with the same id");
     buffer_[param_registering_index_] = parameter_delegate;
     param_registering_index_++;
@@ -17,7 +17,7 @@ void ParameterDatabase::registerParameter(AbstractParameterDefinition* parameter
 
 size_t ParameterDatabase::getAmountOfRegisteredParameters() const { return param_registering_index_; }
 
-AbstractParameterDefinition* ParameterDatabase::getParameterDelegateById(ParameterID id) const {
+AbstractParameterDefinition* ParameterDatabase::getParameterDefinitionById(ParameterID id) const {
     for (AbstractParameterDefinition* delegate : buffer_) {
         if (delegate == nullptr) continue;
 
@@ -29,7 +29,7 @@ AbstractParameterDefinition* ParameterDatabase::getParameterDelegateById(Paramet
     return nullptr;
 }
 
-AbstractParameterDefinition* ParameterDatabase::getParameterDelegateByIndex(size_t index) const {
+AbstractParameterDefinition* ParameterDatabase::getParameterDefinitionByIndex(size_t index) const {
     if (index >= param_registering_index_) {
         return nullptr;
     }
