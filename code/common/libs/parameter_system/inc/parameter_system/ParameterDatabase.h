@@ -25,13 +25,13 @@ public:
 
     [[nodiscard]] size_t getAmountOfRegisteredParameters() const;
 
-    [[nodiscard]] AbstractParameterDefinition* getParameterDelegateById(ParameterID id) const;
-    [[nodiscard]] AbstractParameterDefinition* getParameterDelegateByIndex(size_t index) const;
+    [[nodiscard]] AbstractParameterDefinition* getParameterDefinitionById(ParameterID id) const;
+    [[nodiscard]] AbstractParameterDefinition* getParameterDefinitionByIndex(size_t index) const;
 
     template <ParameterType parameter_type>
-    [[nodiscard]] auto getParameterDelegateByIdAs(ParameterID id) const;
+    [[nodiscard]] auto getParameterDefinitionByIdAs(ParameterID id) const;
     template <ParameterType parameter_type>
-    [[nodiscard]] auto getParameterDelegateByIndexAs(size_t index) const;
+    [[nodiscard]] auto getParameterDefinitionByIndexAs(size_t index) const;
 
     [[nodiscard]] std::span<AbstractParameterDefinition*> getParameterDelegates() const;
 
@@ -49,28 +49,70 @@ private:
 
 /// ------------------------ TEMPLATE DEFINITIONS --------------------------------------
 
-template <ParameterType parameter_type>
-auto ParameterDatabase::getParameterDelegateByIdAs(const ParameterID id) const {
-    AbstractParameterDefinition* parameter_delegate = getParameterDelegateById(id);
+template <ParameterType T_ParameterType>
+auto ParameterDatabase::getParameterDefinitionByIdAs(const ParameterID id) const {
+    AbstractParameterDefinition* parameter_definition_ptr = getParameterDefinitionById(id);
+    ASSERT(parameter_definition_ptr->getMetaData().type == T_ParameterType);
 
-    // Check if the stored type matches the requested type
-    if (parameter_delegate->getMetaData().type == parameter_type) {
-        return static_cast<NumericParameterDefinition<parameter_type>*>(parameter_delegate);
+    // TODO should dynamic cast be used? Only con is that it need RTTI
+    if constexpr (T_ParameterType == ParameterType::uint8) {
+        return static_cast<ParamUint8*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::uint16) {
+        return static_cast<ParamUint16*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::uint32) {
+        return static_cast<ParamUint32*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::uint64) {
+        return static_cast<ParamUint64*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::int8) {
+        return static_cast<ParamInt8*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::int16) {
+        return static_cast<ParamInt16*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::int32) {
+        return static_cast<ParamInt32*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::int64) {
+        return static_cast<ParamInt64*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::floating_point) {
+        return static_cast<ParamFloat*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::double_float) {
+        return static_cast<ParamDouble*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::boolean) {
+        return static_cast<ParamBoolean*>(parameter_definition_ptr);
+    } else {
+        return static_cast<void*>(nullptr);
     }
-
-    return static_cast<NumericParameterDefinition<parameter_type>*>(nullptr);
 }
 
-template <ParameterType parameter_type>
-auto ParameterDatabase::getParameterDelegateByIndexAs(const size_t index) const {
-    AbstractParameterDefinition* parameter_delegate = getParameterDelegateByIndex(index);
+template <ParameterType T_ParameterType>
+auto ParameterDatabase::getParameterDefinitionByIndexAs(const size_t index) const {
+    AbstractParameterDefinition* parameter_definition_ptr = getParameterDefinitionByIndex(index);
+    ASSERT(parameter_definition_ptr->getMetaData().type == T_ParameterType);
 
-    // Check if the stored type matches the requested type
-    if (parameter_delegate->getMetaData().type == parameter_type) {
-        return static_cast<NumericParameterDefinition<parameter_type>*>(parameter_delegate);
+    // TODO should dynamic cast be used? Only con is that it need RTTI
+    if constexpr (T_ParameterType == ParameterType::uint8) {
+        return static_cast<ParamUint8*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::uint16) {
+        return static_cast<ParamUint16*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::uint32) {
+        return static_cast<ParamUint32*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::uint64) {
+        return static_cast<ParamUint64*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::int8) {
+        return static_cast<ParamInt8*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::int16) {
+        return static_cast<ParamInt16*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::int32) {
+        return static_cast<ParamInt32*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::int64) {
+        return static_cast<ParamInt64*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::floating_point) {
+        return static_cast<ParamFloat*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::double_float) {
+        return static_cast<ParamDouble*>(parameter_definition_ptr);
+    } else if constexpr (T_ParameterType == ParameterType::boolean) {
+        return static_cast<ParamBoolean*>(parameter_definition_ptr);
+    } else {
+        return static_cast<void*>(nullptr);
     }
-
-    return static_cast<NumericParameterDefinition<parameter_type>*>(nullptr);
 }
 
 }  // namespace parameter_system

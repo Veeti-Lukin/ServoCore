@@ -19,7 +19,7 @@ ResponseData getParamIds(std::span<std::uint8_t> request_data) {
 
     for (size_t i = 0; i < parameter_database.getAmountOfRegisteredParameters(); i++) {
         parameter_system::AbstractParameterDefinition* param_delegate =
-            parameter_database.getParameterDelegateByIndex(i);
+            parameter_database.getParameterDefinitionByIndex(i);
         response_payload.registered_parameter_ids.pushBack(param_delegate->getMetaData().id);
     }
 
@@ -34,7 +34,7 @@ ResponseData getParamMetaData(std::span<std::uint8_t> request_data) {
     protocol::requests::GetParameterMetaData::RequestPayload request(request_data);
 
     parameter_system::AbstractParameterDefinition* param_delegate =
-        parameter_database.getParameterDelegateById(request.parameter_id);
+        parameter_database.getParameterDefinitionById(request.parameter_id);
 
     // Parameter not found
     if (param_delegate == nullptr) {
