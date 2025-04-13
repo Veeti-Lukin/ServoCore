@@ -19,6 +19,15 @@ public:
 
     [[nodiscard]] ParameterMetaData getMetaData() const { return meta_data_; }
 
+    [[nodiscard]] bool valueIsReadable() const {
+        return meta_data_.read_write_access == ReadWriteAccess::read_only ||
+               meta_data_.read_write_access == ReadWriteAccess::read_write;
+    }
+    [[nodiscard]] bool valueIsWritable() const {
+        return meta_data_.read_write_access == ReadWriteAccess::write_only ||
+               meta_data_.read_write_access == ReadWriteAccess::read_write;
+    }
+
 protected:
     AbstractParameterDefinition(ParameterID id, ReadWriteAccess read_write_access, const char name[],
                                 ParameterType type, void* data_ptr, ParameterOnChangeCallback on_change_cb) {
@@ -97,19 +106,15 @@ public:
     ~NumericParameterDefinition() override = default;
 
     [[nodiscard]] T getValue() const {
-        if (meta_data_.read_write_access != ReadWriteAccess::read_only &&
-            meta_data_.read_write_access != ReadWriteAccess::read_write) {
-            // TODO do what? return 0? assert?
-        }
+        ASSERT_WITH_MESSAGE(valueIsReadable(), "Value is not readable");
+        // TODO what to do if the asserts are disabled
 
         return deduced_data_ref_;
     }
 
     void setValue(T value) {
-        if (meta_data_.read_write_access != ReadWriteAccess::write_only &&
-            meta_data_.read_write_access != ReadWriteAccess::read_write) {
-            // TODO do what? return false? assert?
-        }
+        ASSERT_WITH_MESSAGE(valueIsWritable(), "Value is not writable");
+        // TODO what to do if the asserts are disabled
 
         deduced_data_ref_ = value;
         if (on_change_callback_ != nullptr) {
@@ -117,29 +122,28 @@ public:
         }
     }
 
-    // TODO handle the read write access and on_change_callback
-    void setValueFromType(uint8_t value) override { deduced_data_ref_ = value; }
-    void setValueFromType(uint16_t value) override { deduced_data_ref_ = value; }
-    void setValueFromType(uint32_t value) override { deduced_data_ref_ = value; }
-    void setValueFromType(uint64_t value) override { deduced_data_ref_ = value; }
-    void setValueFromType(int8_t value) override { deduced_data_ref_ = value; }
-    void setValueFromType(int16_t value) override { deduced_data_ref_ = value; }
-    void setValueFromType(int32_t value) override { deduced_data_ref_ = value; }
-    void setValueFromType(int64_t value) override { deduced_data_ref_ = value; }
-    void setValueFromType(float value) override { deduced_data_ref_ = value; }
-    void setValueFromType(double value) override { deduced_data_ref_ = value; }
+    void setValueFromType(uint8_t value) override { setValue(value); }
+    void setValueFromType(uint16_t value) override { setValue(value); }
+    void setValueFromType(uint32_t value) override { setValue(value); }
+    void setValueFromType(uint64_t value) override { setValue(value); }
+    void setValueFromType(int8_t value) override { setValue(value); }
+    void setValueFromType(int16_t value) override { setValue(value); }
+    void setValueFromType(int32_t value) override { setValue(value); }
+    void setValueFromType(int64_t value) override { setValue(value); }
+    void setValueFromType(float value) override { setValue(value); }
+    void setValueFromType(double value) override { setValue(value); }
 
     // TODO handle the read write access
-    [[nodiscard]] uint8_t  getValueAsUint8() override { return deduced_data_ref_; }
-    [[nodiscard]] uint16_t getValueAsUint16() override { return deduced_data_ref_; }
-    [[nodiscard]] uint32_t getValueAsUint32() override { return deduced_data_ref_; }
-    [[nodiscard]] uint64_t getValueAsUint64() override { return deduced_data_ref_; }
-    [[nodiscard]] int8_t   getValueAsInt8() override { return deduced_data_ref_; }
-    [[nodiscard]] int16_t  getValueAsInt16() override { return deduced_data_ref_; }
-    [[nodiscard]] int32_t  getValueAsInt32() override { return deduced_data_ref_; }
-    [[nodiscard]] int64_t  getValueAsInt64() override { return deduced_data_ref_; }
-    [[nodiscard]] float    getValueAsDouble() override { return deduced_data_ref_; }
-    [[nodiscard]] double   getValueAsFloat() override { return deduced_data_ref_; }
+    [[nodiscard]] uint8_t  getValueAsUint8() override { return getValue(); }
+    [[nodiscard]] uint16_t getValueAsUint16() override { return getValue(); }
+    [[nodiscard]] uint32_t getValueAsUint32() override { return getValue(); }
+    [[nodiscard]] uint64_t getValueAsUint64() override { return getValue(); }
+    [[nodiscard]] int8_t   getValueAsInt8() override { return getValue(); }
+    [[nodiscard]] int16_t  getValueAsInt16() override { return getValue(); }
+    [[nodiscard]] int32_t  getValueAsInt32() override { return getValue(); }
+    [[nodiscard]] int64_t  getValueAsInt64() override { return getValue(); }
+    [[nodiscard]] float    getValueAsDouble() override { return getValue(); }
+    [[nodiscard]] double   getValueAsFloat() override { return getValue(); }
 
 private:
     T& deduced_data_ref_ = *static_cast<T*>(data_ptr_);
@@ -164,17 +168,15 @@ public:
     ~BooleanParameterDefinition() override = default;
 
     [[nodiscard]] T getValue() const {
-        if (meta_data_.read_write_access != ReadWriteAccess::read_only &&
-            meta_data_.read_write_access != ReadWriteAccess::read_write) {
-            // TODO do what? return 0? assert?
-        }
+        ASSERT_WITH_MESSAGE(valueIsReadable(), "Value is not writable");
+        // TODO what to do if the asserts are disabled
+
         return deduced_data_ref_;
     }
     void setValue(T value) {
-        if (meta_data_.read_write_access != ReadWriteAccess::write_only &&
-            meta_data_.read_write_access != ReadWriteAccess::read_write) {
-            // TODO do what? return false? assert?
-        }
+        ASSERT_WITH_MESSAGE(valueIsWritable(), "Value is not writable");
+        // TODO what to do if the asserts are disabled
+
         deduced_data_ref_ = value;
     }
 
