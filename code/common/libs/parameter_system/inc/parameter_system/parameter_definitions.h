@@ -6,98 +6,29 @@
 
 #include "assert/assert.h"
 #include "parameter_system/ParameterDeclaration.h"
+#include "parameter_system/abstract_parameter_definitions.h"
 #include "parameter_system/definitions.h"
 #include "parameter_system/parameter_type_mappings.h"
 
 namespace parameter_system {
 
-using ParameterOnChangeCallback = void (*)();
-
-class AbstractParameterDefinition {
-public:
-    virtual ~AbstractParameterDefinition() = default;
-
-    [[nodiscard]] ParameterMetaData getMetaData() const { return meta_data_; }
-
-    [[nodiscard]] bool valueIsReadable() const {
-        return meta_data_.read_write_access == ReadWriteAccess::read_only ||
-               meta_data_.read_write_access == ReadWriteAccess::read_write;
-    }
-    [[nodiscard]] bool valueIsWritable() const {
-        return meta_data_.read_write_access == ReadWriteAccess::write_only ||
-               meta_data_.read_write_access == ReadWriteAccess::read_write;
-    }
-
-protected:
-    AbstractParameterDefinition(ParameterID id, ReadWriteAccess read_write_access, const char name[],
-                                ParameterType type, void* data_ptr, ParameterOnChangeCallback on_change_cb) {
-        meta_data_.id                = id;
-        meta_data_.read_write_access = read_write_access;
-        meta_data_.type              = type;
-        // copy the name to the metadata
-        for (size_t i = 0; i < ParameterMetaData::K_PARAMETER_NAME_MAX_LENGTH; i++) {
-            meta_data_.name[i] = name[i];
-
-            if (name[i] == '\0') break;
-            if (i == ParameterMetaData::K_PARAMETER_NAME_MAX_LENGTH - 1)
-                ASSERT_WITH_MESSAGE(name[i] == '\0', "Parameter name is too long");
-        }
-
-        on_change_callback_ = on_change_cb;
-        data_ptr_           = data_ptr;
-    }
-
-    ParameterMetaData         meta_data_{};
-    ParameterOnChangeCallback on_change_callback_ = nullptr;
-    void*                     data_ptr_           = nullptr;
-};
-
-//
-//
-//
-//
-//
-//
-
-class AbstractNumericParameterDefinition : public AbstractParameterDefinition {
-public:
-    // These methods might cut the actual value when it is set to referenced data
-    virtual void setValueFromType(uint8_t value)      = 0;
-    virtual void setValueFromType(uint16_t value)     = 0;
-    virtual void setValueFromType(uint32_t value)     = 0;
-    virtual void setValueFromType(uint64_t value)     = 0;
-    virtual void setValueFromType(int8_t value)       = 0;
-    virtual void setValueFromType(int16_t value)      = 0;
-    virtual void setValueFromType(int32_t value)      = 0;
-    virtual void setValueFromType(int64_t value)      = 0;
-    virtual void setValueFromType(float value)        = 0;
-    virtual void setValueFromType(double value)       = 0;
-
-    // These methods might return value that is smaller than actually referenced data
-    [[nodiscard]] virtual uint8_t  getValueAsUint8()  = 0;
-    [[nodiscard]] virtual uint16_t getValueAsUint16() = 0;
-    [[nodiscard]] virtual uint32_t getValueAsUint32() = 0;
-    [[nodiscard]] virtual uint64_t getValueAsUint64() = 0;
-    [[nodiscard]] virtual int8_t   getValueAsInt8()   = 0;
-    [[nodiscard]] virtual int16_t  getValueAsInt16()  = 0;
-    [[nodiscard]] virtual int32_t  getValueAsInt32()  = 0;
-    [[nodiscard]] virtual int64_t  getValueAsInt64()  = 0;
-    [[nodiscard]] virtual float    getValueAsDouble() = 0;
-    [[nodiscard]] virtual double   getValueAsFloat()  = 0;
-
-protected:
-    AbstractNumericParameterDefinition(ParameterID id, ReadWriteAccess read_write_access, const char name[],
-                                       ParameterType type, void* data_ptr, ParameterOnChangeCallback on_change_cb)
-        : AbstractParameterDefinition(id, read_write_access, name, type, data_ptr, on_change_cb) {
-        ASSERT_WITH_MESSAGE(paramTypeIsNumeric(type), "Parameter type must be numeric");
-    }
-};
-
+/**
+ * @brief Concrete implementation for a numeric parameter.
+ * @tparam T_ParameterType The ParameterType (e.g. uint8, int32, float, etc.).
+ */
 template <ParameterType T_ParameterType>
 class NumericParameterDefinition final : public AbstractNumericParameterDefinition {
 public:
     using T = typename MapParameterTypeToCppType<T_ParameterType>::type;
 
+    /**
+     * @brief Constructs a numeric parameter definition.
+     * @param declaration Declaration including the parameter ID.
+     * @param read_write_access Read/write access mode.
+     * @param name Parameter name.
+     * @param data_ref Reference to the data backing this parameter.
+     * @param on_change_cb Optional change callback.
+     */
     NumericParameterDefinition(ParameterDeclaration<T_ParameterType> declaration, ReadWriteAccess read_write_access,
                                const char name[], T& data_ref, ParameterOnChangeCallback on_change_cb = nullptr)
         : AbstractNumericParameterDefinition(declaration.id, read_write_access, name, T_ParameterType, &data_ref,
@@ -105,6 +36,12 @@ public:
 
     ~NumericParameterDefinition() override = default;
 
+    /**
+     * @brief Retrieves the current value of the parameter.
+     *        Checking if the value is readable must be checked explicitly before trying to read the value or this
+     *        might assert
+     * @return Current value.
+     */
     [[nodiscard]] T getValue() const {
         ASSERT_WITH_MESSAGE(valueIsReadable(), "Value is not readable");
         // TODO what to do if the asserts are disabled
@@ -112,6 +49,12 @@ public:
         return deduced_data_ref_;
     }
 
+    /**
+     * @brief Sets the parameter to a new value and invokes callback if available.
+     *        Checking if the value is writable must be checked explicitly before trying to read the value or this
+     *        might assert
+     * @param value New value.
+     */
     void setValue(T value) {
         ASSERT_WITH_MESSAGE(valueIsWritable(), "Value is not writable");
         // TODO what to do if the asserts are disabled
@@ -122,6 +65,7 @@ public:
         }
     }
 
+    /// Overridden type-agnostic setters.
     void setValueFromType(uint8_t value) override { setValue(value); }
     void setValueFromType(uint16_t value) override { setValue(value); }
     void setValueFromType(uint32_t value) override { setValue(value); }
@@ -133,7 +77,7 @@ public:
     void setValueFromType(float value) override { setValue(value); }
     void setValueFromType(double value) override { setValue(value); }
 
-    // TODO handle the read write access
+    /// Overridden type-agnostic setters.
     [[nodiscard]] uint8_t  getValueAsUint8() override { return getValue(); }
     [[nodiscard]] uint16_t getValueAsUint16() override { return getValue(); }
     [[nodiscard]] uint32_t getValueAsUint32() override { return getValue(); }
@@ -156,10 +100,21 @@ private:
 //
 //
 
+/**
+ * @brief Concrete implementation for a boolean parameter.
+ */
 class BooleanParameterDefinition final : public AbstractParameterDefinition {
 public:
     using T = MapParameterTypeToCppType<ParameterType::boolean>::type;
 
+    /**
+     * @brief Constructs a boolean parameter.
+     * @param declaration Parameter declaration.
+     * @param read_write_access Read/write access mode.
+     * @param name Parameter name.
+     * @param data_ref Reference to the boolean data.
+     * @param on_change_cb Optional change callback.
+     */
     BooleanParameterDefinition(ParameterDeclaration<ParameterType::boolean> declaration,
                                ReadWriteAccess read_write_access, const char name[], bool& data_ref,
                                ParameterOnChangeCallback on_change_cb = nullptr)
@@ -167,12 +122,24 @@ public:
                                       on_change_cb) {}
     ~BooleanParameterDefinition() override = default;
 
+    /**
+     * @brief Returns the boolean parameter value.
+     *        Checking if the value is readable must be checked explicitly before trying to read the value or this
+     *        might assert
+     * @return Current boolean value.
+     */
     [[nodiscard]] T getValue() const {
         ASSERT_WITH_MESSAGE(valueIsReadable(), "Value is not writable");
         // TODO what to do if the asserts are disabled
 
         return deduced_data_ref_;
     }
+    /**
+     * @brief Sets the boolean parameter value.
+     *        Checking if the value is writable must be checked explicitly before trying to read the value or this
+     *        might assert
+     * @param value New value to assign.
+     */
     void setValue(T value) {
         ASSERT_WITH_MESSAGE(valueIsWritable(), "Value is not writable");
         // TODO what to do if the asserts are disabled
@@ -191,6 +158,7 @@ private:
 //
 //
 
+/// Type aliases for common numeric and boolean parameter types
 using ParamUint8   = NumericParameterDefinition<ParameterType::uint8>;
 using ParamUint16  = NumericParameterDefinition<ParameterType::uint16>;
 using ParamUint32  = NumericParameterDefinition<ParameterType::uint32>;
