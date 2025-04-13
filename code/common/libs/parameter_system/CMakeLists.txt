@@ -3,6 +3,7 @@ add_library(parameter_system STATIC
         src/ParameterDatabase.cpp
 
         inc/parameter_system/parameter_definitions.h
+        inc/parameter_system/abstract_parameter_definitions.h
 
         inc/parameter_system/parameter_type_mappings.h
 

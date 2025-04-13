@@ -7,6 +7,7 @@
 namespace parameter_system {
 
 using ParameterID                        = uint8_t;
+using ParameterOnChangeCallback = void (*)();
 constexpr ParameterID K_MAX_PARAMETER_ID = std::numeric_limits<ParameterID>::max();
 
 enum class ParameterType : uint8_t {
