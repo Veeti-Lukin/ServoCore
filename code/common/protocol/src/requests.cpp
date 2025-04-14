@@ -47,4 +47,32 @@ utils::StaticList<uint8_t, K_PAYLOAD_MAX_SIZE> GetParameterMetaData::ResponsePay
     return buffer;
 }
 
+ReadParameterValue::RequestPayload::RequestPayload(std::span<uint8_t> buffer) {
+    id          = buffer[0];
+    target_type = static_cast<parameter_system::ParameterType>(buffer[1]);
+}
+
+utils::StaticList<uint8_t, K_PAYLOAD_MAX_SIZE> ReadParameterValue::RequestPayload::serialize() {
+    utils::StaticList<uint8_t, K_PAYLOAD_MAX_SIZE> buffer;
+
+    buffer.pushBack(id);                                 // byte 1
+    buffer.pushBack(static_cast<uint8_t>(target_type));  // byte 2
+
+    return buffer;
+}
+
+ReadParameterValue::ResponsePayload::ResponsePayload(std::span<uint8_t> buffer) {
+    std::memcpy(serialized_value, buffer.data(), buffer.size_bytes());
+}
+
+utils::StaticList<uint8_t, K_PAYLOAD_MAX_SIZE> ReadParameterValue::ResponsePayload::serialize() {
+    utils::StaticList<uint8_t, K_PAYLOAD_MAX_SIZE> buffer;
+
+    for (uint8_t byte : serialized_value) {
+        buffer.pushBack(byte);
+    }
+
+    return buffer;
+}
+
 }  // namespace protocol::requests

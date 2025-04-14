@@ -48,8 +48,28 @@ ResponseData getParamMetaData(std::span<std::uint8_t> request_data) {
         .response_data = protocol::requests::GetParameterMetaData::ResponsePayload(parameter_meta_data).serialize()};
 }
 
-ResponseData setParamValue(std::span<std::uint8_t> request_data) { return {}; }
 
-ResponseData getParamValue(std::span<std::uint8_t> request_data) { return {}; }
+ResponseData getParamValue(std::span<std::uint8_t> request_data) {
+    protocol::requests::ReadParameterValue::RequestPayload request(request_data);
+
+    parameter_system::AbstractParameterDefinition* param = parameter_database.getParameterDefinitionById(request.id);
+    // Parameter not found
+    if (param == nullptr) {
+        return {.response_code = serial_communication_framework::ResponseCode::invalid_arguments, .response_data = {}};
+    }
+
+    if (!param->valueIsReadable()) {
+        return {serial_communication_framework::ResponseCode::not_allowed, {}};
+    }
+
+    if (param->getMetaData().type != request.target_type) {
+        return {serial_communication_framework::ResponseCode::type_mismatch, {}};
+    }
+
+    protocol::requests::ReadParameterValue::ResponsePayload response;
+    param->getValueRaw({response.serialized_value});
+
+    return {serial_communication_framework::ResponseCode::ok, response.serialize()};
+}
 
 }  // namespace protocol_handlers
