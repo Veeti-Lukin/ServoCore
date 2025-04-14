@@ -12,6 +12,9 @@ enum class ResponseCode : uint8_t {
     unknown_operation_code,
     invalid_arguments,
     payload_missing_parts,
+    out_of_bounds,
+    type_mismatch,
+    not_allowed,
     timed_out,
     corrupted,  // crc matching failed
 };

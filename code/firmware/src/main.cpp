@@ -114,6 +114,7 @@ void initSWLibs() {
                                      protocol_handlers::getParamIds);
     protocol_handler.registerHandler(protocol::requests::GetParameterMetaData::op_code,
                                      protocol_handlers::getParamMetaData);
+    protocol_handler.registerHandler(protocol::requests::ReadParameterValue::op_code, protocol_handlers::getParamValue);
 }
 
 int main() {
