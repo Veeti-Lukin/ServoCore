@@ -40,6 +40,9 @@ add_executable(ServoCore_dev_tool
         src/parameter_table/ParameterValueDelegate.cpp
         # ------ ---------------- ------
 
+        inc/CommunicationDebuggerWindow.h
+        src/CommunicationDebuggerWindow.cpp
+        ui/CommunicationDebuggerWindow.ui
 )
 
 target_include_directories(ServoCore_dev_tool PRIVATE inc ui)
