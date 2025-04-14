@@ -62,6 +62,7 @@ private:
 
     [[nodiscard]] QVector<RowData> fetchParameters() const;
     void                           refreshParameterValues();
+    QVariant getParameterValue(parameter_system::ParameterID id, parameter_system::ParameterType type) const;
 };
 
 }  // namespace parameter_table
