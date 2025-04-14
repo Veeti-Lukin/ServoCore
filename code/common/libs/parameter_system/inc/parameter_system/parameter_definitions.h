@@ -89,6 +89,23 @@ public:
     [[nodiscard]] float    getValueAsDouble() override { return getValue(); }
     [[nodiscard]] double   getValueAsFloat() override { return getValue(); }
 
+    void setValueRaw(std::span<uint8_t> buff) override {
+        ASSERT(valueIsWritable());
+        ASSERT(buff.size_bytes() >= sizeof(T));
+
+        std::memcpy(&deduced_data_ref_, buff.data(), sizeof(T));
+
+        if (on_change_callback_ != nullptr) {
+            on_change_callback_();
+        }
+    }
+    void getValueRaw(std::span<uint8_t> target_buff) override {
+        ASSERT(valueIsReadable());
+        ASSERT(target_buff.size_bytes() >= sizeof(T));
+
+        std::memcpy(target_buff.data(), &deduced_data_ref_, sizeof(T));
+    }
+
 private:
     T& deduced_data_ref_ = *static_cast<T*>(data_ptr_);
 };
@@ -145,6 +162,23 @@ public:
         // TODO what to do if the asserts are disabled
 
         deduced_data_ref_ = value;
+    }
+
+    void setValueRaw(std::span<uint8_t> buff) override {
+        ASSERT(valueIsWritable());
+        ASSERT(buff.size_bytes() >= sizeof(T));
+
+        std::memcpy(&deduced_data_ref_, buff.data(), sizeof(T));
+
+        if (on_change_callback_ != nullptr) {
+            on_change_callback_();
+        }
+    }
+    void getValueRaw(std::span<uint8_t> target_buff) override {
+        ASSERT(valueIsReadable());
+        ASSERT(target_buff.size_bytes() >= sizeof(T));
+
+        std::memcpy(target_buff.data(), &deduced_data_ref_, sizeof(T));
     }
 
 private:
