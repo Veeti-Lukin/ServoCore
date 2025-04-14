@@ -34,6 +34,10 @@ public:
                meta_data_.read_write_access == ReadWriteAccess::read_write;
     }
 
+    virtual void setValueRaw(std::span<uint8_t> buff)        = 0;
+
+    virtual void getValueRaw(std::span<uint8_t> target_buff) = 0;
+
 protected:
     /**
      * @brief Constructor for AbstractParameterDefinition.
