@@ -3,7 +3,6 @@
 #include <hardware/pwm.h>
 #include <hardware/structs/uart.h>
 #include <hardware/uart.h>
-#include <pico/time.h>
 
 #include <cmath>
 
@@ -12,6 +11,7 @@
 #include "drivers/AnalogRgbLedDriver.h"
 #include "drivers/BufferedAsyncUartDriver.h"
 #include "drivers/PwmSliceDriver.h"
+#include "drivers/TimerDriver.h"
 #include "hw_mappings.h"
 #include "led_controller/LedController.h"
 #include "led_controller/common_colors.h"
@@ -45,7 +45,6 @@ drivers::AnalogRgbLedDriver led_driver(
     drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(hw_mappings::K_STATUS_LED_GREEN_PIN)), &blue_slice_driver,
     drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(hw_mappings::K_STATUS_LED_BLUE_PIN)));
 led_controller::LedController status_led_controller(&led_driver);
-repeating_timer               timer;
 
 // ----------------------------- PARAMETER SYSTEM ------------------------------
 parameter_system::ParameterDelegateBase* parameter_buffer[64] = {nullptr};
@@ -54,6 +53,8 @@ parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
 // ----------------------------- COMM PROTOCOL --------------------------------
 serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64] = {};
 serial_communication_framework::SlaveHandler             protocol_handler({handler_buffer}, uart0_controller, 0);
+
+drivers::TimerDriver led_timer(timer_hw, drivers::TimerAlarmChannel::alarm4);
 
 void uart0_putchar(char c) { uart0_controller.transmitByte(c); }
 void uart0_flush() { uart0_controller.flushTx(); }
@@ -73,9 +74,9 @@ void uart0_isr() {
     }
 }
 
-bool led_timer_isr(__unused repeating_timer_t*) {
+void led_timer_isr2() {
     status_led_controller.periodicUpdate(20);
-    return true;
+    led_timer.start();
 }
 
 void initHW() {
@@ -101,7 +102,23 @@ void initHW() {
     led_driver.setBrightness(25);
 
     // --------------- INIT LED TIMER ---------------
-    add_repeating_timer_ms(-20, led_timer_isr, nullptr, &timer);
+    // add_repeating_timer_ms(-20, led_timer_isr, nullptr, &timer);
+
+    led_timer.configureInMilliseconds(20);
+    // TODO some handler already is put there by the pico stdlib which
+    // hast to be removed, better thing would be to get rid of the interrupt handler automatic registering alltogether
+    irq_remove_handler(led_timer.getIrqNumber(), irq_get_exclusive_handler(led_timer.getIrqNumber()));
+    irq_set_exclusive_handler(led_timer.getIrqNumber(), led_timer_isr2);
+    irq_clear(led_timer.getIrqNumber());
+    irq_set_enabled(led_timer.getIrqNumber(), true);
+    led_timer.start();
+
+    irq_get_exclusive_handler(led_timer.getIrqNumber());
+
+    // hw_set_bits(&timer_hw->inte, 1u << 3);
+    // irq_set_exclusive_handler(led_timer.getIrqNumber(), led_timer_isr2);
+    // irq_set_enabled(led_timer.getIrqNumber(), true);
+    // timer_hw->alarm[0] = (uint32_t)200 * 1000;
 }
 
 void initSWLibs() {
