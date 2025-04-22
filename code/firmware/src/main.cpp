@@ -3,7 +3,6 @@
 #include <hardware/pwm.h>
 #include <hardware/structs/uart.h>
 #include <hardware/uart.h>
-#include <pico/time.h>
 
 #include <cmath>
 
@@ -12,7 +11,9 @@
 #include "drivers/AnalogRgbLedDriver.h"
 #include "drivers/BufferedAsyncUartDriver.h"
 #include "drivers/PwmSliceDriver.h"
+#include "drivers/TimerDriver.h"
 #include "hw_mappings.h"
+#include "interrupt_service_routines.h"
 #include "led_controller/LedController.h"
 #include "led_controller/common_colors.h"
 #include "parameter_system/ParameterDatabase.h"
@@ -45,8 +46,9 @@ drivers::AnalogRgbLedDriver led_driver(
     drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(hw_mappings::K_STATUS_LED_GREEN_PIN)), &blue_slice_driver,
     drivers::mapIndexToPwmChannel(pwm_gpio_to_channel(hw_mappings::K_STATUS_LED_BLUE_PIN)));
 led_controller::LedController status_led_controller(&led_driver);
-repeating_timer               timer;
 
+drivers::TimerDriver led_update_timer(hw_mappings::K_PERIODIC_LED_TIMER_INSTANCE,
+                                      hw_mappings::K_PERIODIC_LED_TIMER_ALARM_CHANNEL);
 // ----------------------------- PARAMETER SYSTEM ------------------------------
 parameter_system::ParameterDelegateBase* parameter_buffer[64] = {nullptr};
 parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
@@ -73,11 +75,6 @@ void uart0_isr() {
     }
 }
 
-bool led_timer_isr(__unused repeating_timer_t*) {
-    status_led_controller.periodicUpdate(20);
-    return true;
-}
-
 void initHW() {
     // --------------- INIT UART ---------------
     // Set the TX and RX pins by using the function select on the GPIO
@@ -101,7 +98,10 @@ void initHW() {
     led_driver.setBrightness(25);
 
     // --------------- INIT LED TIMER ---------------
-    add_repeating_timer_ms(-20, led_timer_isr, nullptr, &timer);
+    led_update_timer.configureInMilliseconds(20);  // Lowering this increases the accuracy of led effects
+    irq_set_exclusive_handler(led_update_timer.getIrqNumber(), periodicLedUpdateTimerISR);
+    irq_set_enabled(led_update_timer.getIrqNumber(), true);
+    led_update_timer.start();
 }
 
 void initSWLibs() {

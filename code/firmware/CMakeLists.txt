@@ -12,6 +12,9 @@ add_executable(ServoCore_firmware
 
         inc/protocol_handlers.h
         src/protocol_handlers.cpp
+
+        inc/interrupt_service_routines.h
+        src/interrupt_service_routines.cpp
 )
 
 target_include_directories(ServoCore_firmware PRIVATE inc)
@@ -28,6 +31,7 @@ target_link_libraries(ServoCore_firmware PUBLIC
         assert
         protocol
 )
+
 
 pico_add_extra_outputs(ServoCore_firmware)
 
