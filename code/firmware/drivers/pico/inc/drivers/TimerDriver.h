@@ -28,7 +28,7 @@ enum class TimerAlarmChannel : uint8_t { alarm0 = 0, alarm1 = 1, alarm2 = 2, ala
  * The maximum delay that can be scheduled is limited to 2^32 microseconds (~4295 seconds), due to the 32-bit
  * comparison.
  */
-class TimerDriver final : public TimerInterface {
+class TimerDriver final : public interfaces::TimerInterface {
 public:
     /**
      * @brief Construct a new TimerDriver object.

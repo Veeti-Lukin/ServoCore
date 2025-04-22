@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+namespace drivers::interfaces {
 /**
  * @brief Abstract interface for a hardware or software timer driver.
  *
@@ -96,4 +97,5 @@ public:
     virtual void forceFire() const                                = 0;
 };
 
+}  // namespace drivers::interfaces
 #endif  // COMMON_DRIVERS_INTERFACES_TIMERINTERFACE_H
