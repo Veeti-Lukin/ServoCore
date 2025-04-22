@@ -5,6 +5,7 @@
 #include <span>
 
 #include "drivers/interfaces/BufferedSerialCommunicationInterface.h"
+#include "drivers/interfaces/ClockInterface.h"
 #include "serial_communication_framework/common.h"
 #include "serial_communication_framework/packets.h"
 
@@ -21,8 +22,10 @@ class SlaveHandler {
 public:
     explicit SlaveHandler(std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
                           drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface,
-                          uint8_t                                                    device_id);
+                          drivers::interfaces::ClockInterface& clock_interface, uint8_t device_id);
     ~        SlaveHandler() = default;
+
+    void init();
 
     void registerHandler(uint8_t op_code, OperationCodeHandler handler);
 
@@ -40,8 +43,14 @@ private:
     CommunicationStatistics                                    communication_statistics_;
     uint8_t                                                    device_id_;
 
+    drivers::interfaces::ClockInterface& timeout_clock_;
+    uint64_t                             response_timout_start_time_point_;
+
     std::span<OperationCodeHandlerInfo> op_code_handlers_;
     size_t                              op_code_handler_registering_index_ = 0;
+
+    void startResponseTimeout();
+    bool responseHasTimedout();
 };
 
 }  // namespace serial_communication_framework

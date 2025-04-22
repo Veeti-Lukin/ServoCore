@@ -11,6 +11,7 @@
 #include "drivers/AnalogRgbLedDriver.h"
 #include "drivers/BufferedAsyncUartDriver.h"
 #include "drivers/PwmSliceDriver.h"
+#include "drivers/SysClockDriver.h"
 #include "drivers/TimerDriver.h"
 #include "hw_mappings.h"
 #include "interrupt_service_routines.h"
@@ -28,6 +29,8 @@
 #define BAUD_RATE 115200
 
 namespace uart_config = drivers::uart_config;
+// -------------------------------- GENERAL -------------------------------
+drivers::SysClockDriver sys_clock_driver;
 
 // ------------------------------ DEBUG UART ------------------------------
 utils::RingBuffer<128>           debug_uart_tx_buffer;
@@ -55,7 +58,7 @@ parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
 
 // ----------------------------- COMM PROTOCOL --------------------------------
 serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64] = {};
-serial_communication_framework::SlaveHandler             protocol_handler({handler_buffer}, debug_uart, 0);
+serial_communication_framework::SlaveHandler protocol_handler({handler_buffer}, debug_uart, sys_clock_driver, 0);
 
 void debugUartPutChar(char c) { debug_uart.transmitByte(c); }
 void DebugUartFlush() { debug_uart.flushTx(); }
@@ -87,6 +90,9 @@ void initHW() {
     irq_set_exclusive_handler(led_update_timer.getIrqNumber(), periodicLedUpdateTimerISR);
     irq_set_enabled(led_update_timer.getIrqNumber(), true);
     led_update_timer.start();
+
+    // --------------- INIT COMMUNICATION ---------------
+    protocol_handler.init();
 }
 
 void initSWLibs() {

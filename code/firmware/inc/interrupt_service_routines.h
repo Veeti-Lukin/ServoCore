@@ -15,4 +15,6 @@ ATTRIBUTE_ISR void periodicLedUpdateTimerISR();
 
 ATTRIBUTE_ISR void debugUartCombinedISR();
 
+ATTRIBUTE_ISR void communicationTimeoutTimerISR();
+
 #endif  // FIRMWARE_INTERRUPT_SERVICE_ROUTINES_H

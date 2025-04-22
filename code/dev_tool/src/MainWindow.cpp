@@ -38,6 +38,7 @@ void MainWindow::onComPortChanged(int index) {
     delete context_;
     if (!com_port_name.isEmpty()) {
         context_ = new servo_core_control_api::windows::Context(com_port_name.toStdString());
+        context_->open();
     }
     refreshDeviceList();
 }

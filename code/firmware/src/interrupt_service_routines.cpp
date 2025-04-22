@@ -5,12 +5,16 @@
 #include "drivers/BufferedAsyncUartDriver.h"
 #include "drivers/TimerDriver.h"
 #include "led_controller/LedController.h"
+#include "serial_communication_framework/SlaveHandler.h"
 
 extern led_controller::LedController status_led_controller;
 extern drivers::TimerDriver          led_update_timer;
 
 // buffer size template arguments need to be updated here if they are modified in main
 extern drivers::BufferedAsyncUartDriver<128, 128> debug_uart;
+
+extern serial_communication_framework::SlaveHandler protocol_handler;
+extern drivers::TimerDriver                         communication_timeout_timer;
 
 ATTRIBUTE_ISR void periodicLedUpdateTimerISR() {
     status_led_controller.periodicUpdate(led_update_timer.getElapsedMilliseconds());
