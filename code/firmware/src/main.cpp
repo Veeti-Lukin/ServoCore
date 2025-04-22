@@ -30,11 +30,11 @@
 namespace uart_config = drivers::uart_config;
 
 // ------------------------------ DEBUG UART ------------------------------
-utils::RingBuffer<128>           uart_tx_buffer;
-utils::RingBuffer<128>           uart_rx_buffer;
-drivers::BufferedAsyncUartDriver uart0_controller(hw_mappings::K_DEBUG_UART_INSTANCE, &uart_tx_buffer, &uart_rx_buffer,
-                                                  115200, uart_config::DataBits::eight, uart_config::StopBits::one,
-                                                  uart_config::Parity::none);
+utils::RingBuffer<128>           debug_uart_tx_buffer;
+utils::RingBuffer<128>           debug_uart_rx_buffer;
+drivers::BufferedAsyncUartDriver debug_uart(hw_mappings::K_DEBUG_UART_INSTANCE, &debug_uart_tx_buffer,
+                                            &debug_uart_rx_buffer, 115200, uart_config::DataBits::eight,
+                                            uart_config::StopBits::one, uart_config::Parity::none);
 
 // --------------------------------- LED ---------------------------------
 drivers::PwmSliceDriver     red_slice_driver(pwm_gpio_to_slice_num(hw_mappings::K_STATUS_LED_RED_PIN));
@@ -55,25 +55,10 @@ parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
 
 // ----------------------------- COMM PROTOCOL --------------------------------
 serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64] = {};
-serial_communication_framework::SlaveHandler             protocol_handler({handler_buffer}, uart0_controller, 0);
+serial_communication_framework::SlaveHandler             protocol_handler({handler_buffer}, debug_uart, 0);
 
-void uart0_putchar(char c) { uart0_controller.transmitByte(c); }
-void uart0_flush() { uart0_controller.flushTx(); }
-
-void uart0_isr() {
-    // access the UART hardware registers
-    uart_hw_t* uart_hw = uart_get_hw(uart0);
-
-    // check RX interrupt (bit 4 in UART_MIS)
-    if (uart_hw->mis & UART_UARTMIS_RXMIS_BITS) {
-        uart0_controller.handleRxInterrupt();
-    }
-
-    // check TX interrupt (bit 5 in UART_MIS)
-    if (uart_hw->mis & UART_UARTMIS_TXMIS_BITS) {
-        uart0_controller.handleTxInterrupt();
-    }
-}
+void debugUartPutChar(char c) { debug_uart.transmitByte(c); }
+void DebugUartFlush() { debug_uart.flushTx(); }
 
 void initHW() {
     // --------------- INIT UART ---------------
@@ -82,11 +67,11 @@ void initHW() {
     gpio_set_function(hw_mappings::K_DEBUG_UART_TX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_TX_PIN));
     gpio_set_function(hw_mappings::K_DEBUG_UART_RX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_RX_PIN));
 
-    irq_set_exclusive_handler(UART0_IRQ, uart0_isr);
+    irq_set_exclusive_handler(UART0_IRQ, debugUartCombinedISR);
     // Enable the UART IRQ in the NVIC
     irq_set_enabled(UART0_IRQ, true);
 
-    uart0_controller.init();
+    debug_uart.init();
 
     // --------------- INIT LED PWM ---------------
     gpio_set_function(hw_mappings::K_STATUS_LED_RED_PIN, GPIO_FUNC_PWM);
@@ -105,7 +90,7 @@ void initHW() {
 }
 
 void initSWLibs() {
-    debug_print::connectPutCharAndFlushFunctions(&uart0_putchar, &uart0_flush);
+    debug_print::connectPutCharAndFlushFunctions(&debugUartPutChar, &DebugUartFlush);
     assert::setAssertionFailedReaction(assert::OnAssertFailReaction::call_assertion_handler_and_break_point);
 
     protocol_handler.registerHandler(static_cast<uint8_t>(protocol::Commands::ping), protocol_handlers::ping);

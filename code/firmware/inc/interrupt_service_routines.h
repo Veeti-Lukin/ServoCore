@@ -13,4 +13,6 @@
 // This isr can be extended to host other periodic general updates too
 ATTRIBUTE_ISR void periodicLedUpdateTimerISR();
 
+ATTRIBUTE_ISR void debugUartCombinedISR();
+
 #endif  // FIRMWARE_INTERRUPT_SERVICE_ROUTINES_H
