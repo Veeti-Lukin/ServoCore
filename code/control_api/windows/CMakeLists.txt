@@ -16,3 +16,10 @@ target_link_libraries(control_api_windows PUBLIC
         control_api_template
         drivers_interfaces
 )
+
+option(SERVO_CORE_CONTROL_API_WINDOWS_COMPORT_DRIVER_DEBUG_PRINTS
+        "Enable debug messages to monitor all communication trough the windows control api" off)
+if (SERVO_CORE_CONTROL_API_WINDOWS_COMPORT_DRIVER_DEBUG_PRINTS)
+    target_compile_definitions(control_api_windows PRIVATE SERVO_CORE_CONTROL_API_WINDOWS_COMPORT_DRIVER_DEBUG_PRINTS=1)
+    message(STATUS "Control api windows comport driver debug monitor prints are enabled")
+endif ()
