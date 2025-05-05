@@ -12,6 +12,9 @@ add_library(drivers_pico
 
         inc/drivers/TimerDriver.h
         src/TimerDriver.cpp
+
+        inc/drivers/SysClockDriver.h
+        src/SysClockDriver.cpp
 )
 
 set_target_properties(drivers_pico PROPERTIES LINKER_LANGUAGE CXX)
