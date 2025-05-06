@@ -4,6 +4,9 @@ add_library(control_api_windows
 
         inc/control_api/windows/Context.h
         src/Context.cpp
+
+        inc/control_api/windows/internal/ProgramUptimeClock.h
+        src/ProgramUptimeClock.cpp
 )
 
 set_target_properties(control_api_windows PROPERTIES LINKER_LANGUAGE CXX)
