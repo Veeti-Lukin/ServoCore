@@ -6,12 +6,17 @@
 #include "utils/StaticList.h"
 
 namespace serial_communication_framework {
-MasterHandler::MasterHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface)
-    : communication_interface_(communication_interface) {
+
+MasterHandler::MasterHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface,
+                             drivers::interfaces::ClockInterface&                       clock_interface)
+    : timeout_clock_(clock_interface), communication_interface_(communication_interface) {
     ASSERT_WITH_MESSAGE(std::span<uint8_t>(tx_buffer_).size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE,
                         "Too small tx_buffer");
     ASSERT_WITH_MESSAGE(std::span<uint8_t>(rx_buffer_).size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE,
                         "Too small rx_buffer");
+}
+
+void MasterHandler::init() { /* TODO SET THE SERIAL COMMUNICATION SETTINGS */
 }
 
 ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(
@@ -21,10 +26,16 @@ ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(
     std::span<uint8_t> serialized_request = serializeRequest(request, tx_buffer_);
     communication_interface_.transmitBytes(serialized_request);
 
+    startResponseTimeout();
+
     size_t rx_index             = 0;
     size_t expected_packet_size = ResponsePacket::K_PACKET_MAX_SIZE;
 
     while (rx_index < expected_packet_size) {
+        if (responseHasTimedout()) {
+            return {ResponseCode::timed_out, {}};
+        }
+
         if (communication_interface_.getReceivedBytesAvailableAmount() > 0) {
             rx_buffer_[rx_index] = communication_interface_.readReceivedByte();
             rx_index++;
@@ -61,5 +72,16 @@ void MasterHandler::run() {
 }
 
 const CommunicationStatistics& MasterHandler::getStatistics() const { return communication_statistics_; }
+
+void MasterHandler::startResponseTimeout() { response_timout_start_time_point_ = timeout_clock_.uptimeMilliseconds(); }
+
+bool MasterHandler::responseHasTimedout() {
+#ifdef SERVO_CORE_DISABLE_SERIAL_COMMUNICATION_FRAMEWORK_TIMEOUTS
+    return false;
+#endif
+
+    const uint64_t now = timeout_clock_.uptimeMilliseconds();
+    return (now - response_timout_start_time_point_) > K_MASTER_TIMEOUT_MS;
+}
 
 }  // namespace serial_communication_framework

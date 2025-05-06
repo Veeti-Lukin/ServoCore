@@ -4,10 +4,13 @@
 
 namespace servo_core_control_api {
 
-Context::Context(drivers::interfaces::BufferedSerialCommunicationInterface& comm_interface)
-    : communication_handler{comm_interface} {}
+Context::Context(drivers::interfaces::BufferedSerialCommunicationInterface& comm_interface,
+                 drivers::interfaces::ClockInterface&                       comm_timeout_clock)
+    : communication_handler{comm_interface, comm_timeout_clock} {}
 
 Context::~Context() {}
+
+void Context::open() { communication_handler.init(); }
 
 std::optional<Device> Context::tryFindDeviceById(uint8_t id) {
     using serial_communication_framework::ResponseCode;

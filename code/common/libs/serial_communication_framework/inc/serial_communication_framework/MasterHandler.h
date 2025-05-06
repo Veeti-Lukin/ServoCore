@@ -5,6 +5,7 @@
 #include <span>
 
 #include "drivers/interfaces/BufferedSerialCommunicationInterface.h"
+#include "drivers/interfaces/ClockInterface.h"
 #include "serial_communication_framework/common.h"
 #include "serial_communication_framework/packets.h"
 #include "utils/StaticList.h"
@@ -15,8 +16,11 @@ using AsyncCallBack = void (*)(ResponseData);
 
 class MasterHandler {
 public:
-    explicit MasterHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface);
-    ~        MasterHandler() = default;
+     MasterHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface,
+                   drivers::interfaces::ClockInterface&                       clock_interface);
+    ~MasterHandler() = default;
+
+    void init();
 
     [[nodiscard]] ResponseData sendRequestAndReceiveResponseBlocking(
         uint8_t receiver_id, uint8_t operation_code,
@@ -35,8 +39,14 @@ private:
     drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface_;
     CommunicationStatistics                                    communication_statistics_;
 
+    drivers::interfaces::ClockInterface& timeout_clock_;
+    uint64_t                             response_timout_start_time_point_;
+
     // TODO: queue for requests and callbacks
     AsyncCallBack next_response_cb_ = nullptr;
+
+    void startResponseTimeout();
+    bool responseHasTimedout();
 };
 
 }  // namespace serial_communication_framework

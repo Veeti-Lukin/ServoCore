@@ -18,3 +18,9 @@ set_target_properties(serial_communication_framework PROPERTIES LINKER_LANGUAGE 
 target_include_directories(serial_communication_framework PUBLIC inc)
 
 target_link_libraries(serial_communication_framework PRIVATE drivers_interfaces assert utils)
+
+
+option(SERVO_CORE_DISABLE_SERIAL_COMMUNICATION_FRAMEWORK_TIMEOUTS "Disable serial communication framework timeouts for debugging" off)
+if (SERVO_CORE_DISABLE_SERIAL_COMMUNICATION_FRAMEWORK_TIMEOUTS)
+    target_compile_definitions(serial_communication_framework PRIVATE SERVO_CORE_DISABLE_SERIAL_COMMUNICATION_FRAMEWORK_TIMEOUTS=1)
+endif ()
