@@ -33,6 +33,7 @@ ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(
 
     while (rx_index < expected_packet_size) {
         if (responseHasTimedout()) {
+            communication_statistics_.timed_out_packets++;
             return {ResponseCode::timed_out, {}};
         }
 

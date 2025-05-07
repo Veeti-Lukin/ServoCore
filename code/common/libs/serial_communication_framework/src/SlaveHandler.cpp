@@ -78,6 +78,7 @@ void SlaveHandler::run() {
             std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
 
             if (responseHasTimedout()) {
+                communication_statistics_.timed_out_packets++;
                 // Do not answer if the timeout has happened on slave side and let the master run to timeout
                 return;
             }
@@ -100,6 +101,7 @@ void SlaveHandler::run() {
         std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
 
         if (responseHasTimedout()) {
+            communication_statistics_.timed_out_packets++;
             // Do not answer if the timeout has happened on slave side and let the master run to timeout
             return;
         }
