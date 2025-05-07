@@ -7,6 +7,8 @@ namespace serial_communication_framework {
 
 bool responseHasValidCrc(ResponsePacket packet);
 bool requestHasValidCrc(RequestPacket packet);
+bool responseHeaderHasValidCrc(ResponsePacket::Header header);
+bool requestHeaderHasValidCrc(RequestPacket::Header header);
 
 [[nodiscard]] ResponsePacket deSerializeResponse(std::span<uint8_t> data);
 [[nodiscard]] RequestPacket  deSerializeRequest(std::span<uint8_t> data);

@@ -40,7 +40,22 @@ void SlaveHandler::run() {
 
     if (rx_index == RequestPacket::K_HEADER_SIZE) {
         RequestPacket::Header header = deSerializeRequestHeader(rx_buffer_);
-        expected_packet_size         = header.payload_size + RequestPacket::K_HEADER_WITH_CRC_SIZE;
+
+        if (requestHeaderHasValidCrc(header) == false) {
+            communication_statistics_.corrupted_packets_received++;
+            ResponsePacket     response(static_cast<uint8_t>(ResponseCode::corrupted), {});
+            std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
+
+            if (responseHasTimedout()) {
+                // Do not answer if the timeout has happened on slave side and let the master run to timeout
+                return;
+            }
+
+            communication_interface_.transmitBytes(serialized_response);
+            return;
+        }
+
+        expected_packet_size = header.payload_size + RequestPacket::K_HEADER_WITH_CRC_SIZE;
         return;
     }
 

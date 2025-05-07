@@ -45,6 +45,11 @@ ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(
         if (rx_index == ResponsePacket::K_HEADER_SIZE) {
             ResponsePacket::Header header = deSerializeResponseHeader(rx_buffer_);
             expected_packet_size          = header.payload_size + ResponsePacket::K_HEADER_WITH_CRC_SIZE;
+
+            if (!responseHeaderHasValidCrc(header)) {
+                communication_statistics_.corrupted_packets_received++;
+                return ResponseData(ResponseCode::corrupted, {});
+            }
         }
     }
 

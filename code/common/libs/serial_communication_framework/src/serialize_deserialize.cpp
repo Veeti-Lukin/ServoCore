@@ -16,6 +16,16 @@ bool requestHasValidCrc(RequestPacket packet) {
     return true;
 }
 
+bool responseHeaderHasValidCrc(ResponsePacket::Header header) {
+    // TODO implement
+    return true;
+}
+
+bool requestHeaderHasValidCrc(RequestPacket::Header header) {
+    // TODO implement
+    return true;
+}
+
 ResponsePacket deSerializeResponse(std::span<uint8_t> data) {
     ASSERT(data.size_bytes() >= ResponsePacket::K_PACKET_MIN_SIZE);
 
