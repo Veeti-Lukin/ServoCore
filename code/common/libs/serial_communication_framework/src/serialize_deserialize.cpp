@@ -6,22 +6,22 @@
 
 namespace serial_communication_framework {
 
-bool responseHasValidCrc(ResponsePacket packet) {
+bool responseHasValidCrc(const ResponsePacket& packet) {
     // TODO implement
     return true;
 }
 
-bool requestHasValidCrc(RequestPacket packet) {
+bool requestHasValidCrc(const RequestPacket& packet) {
     // TODO implement
     return true;
 }
 
-bool responseHeaderHasValidCrc(ResponsePacket::Header header) {
+bool responseHeaderHasValidCrc(const ResponsePacket::Header& header) {
     // TODO implement
     return true;
 }
 
-bool requestHeaderHasValidCrc(RequestPacket::Header header) {
+bool requestHeaderHasValidCrc(const RequestPacket::Header& header) {
     // TODO implement
     return true;
 }
@@ -50,7 +50,7 @@ RequestPacket deSerializeRequest(std::span<uint8_t> data) {
     return req;
 }
 
-std::span<uint8_t> serializeResponse(ResponsePacket resp, std::span<uint8_t> target_buffer) {
+std::span<uint8_t> serializeResponse(const ResponsePacket& resp, std::span<uint8_t> target_buffer) {
     ASSERT(target_buffer.size_bytes() >= RequestPacket::K_PAYLOAD_MAX_SIZE);
     // Check that the de serialization still since we are assuming that these values are only one byte long
     static_assert(sizeof(ResponsePacket::Header::response_code) == 1);
@@ -70,7 +70,7 @@ std::span<uint8_t> serializeResponse(ResponsePacket resp, std::span<uint8_t> tar
     return target_buffer.subspan(0, ResponsePacket::K_HEADER_WITH_CRC_SIZE + resp.header.payload_size);
 }
 
-std::span<uint8_t> serializeRequest(RequestPacket req, std::span<uint8_t> target_buffer) {
+std::span<uint8_t> serializeRequest(const RequestPacket& req, std::span<uint8_t> target_buffer) {
     ASSERT(target_buffer.size_bytes() >= RequestPacket::K_PAYLOAD_MAX_SIZE);
     // Check that the de serialization still works since we are assuming that these values are only one byte long
     static_assert(sizeof(RequestPacket::Header::receiver_id) == 1);
