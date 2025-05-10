@@ -25,19 +25,24 @@
 #include "serial_communication_framework/SlaveHandler.h"
 #include "utils/RingBuffer.h"
 
-#define UART_ID   uart0
-#define BAUD_RATE 115200
-
 namespace uart_config = drivers::uart_config;
 // -------------------------------- GENERAL -------------------------------
 drivers::SysClockDriver sys_clock_driver;
 
+// ---------------------- SERIAL COMMUNICATION UART -----------------------
+utils::RingBuffer<128>           communication_uart_tx_buffer;
+utils::RingBuffer<128>           communication_uart_rx_buffer;
+drivers::BufferedAsyncUartDriver communication_uart_driver(hw_mappings::K_SERIAL_COMMUNICATION_UART_INSTANCE,
+                                                           &communication_uart_tx_buffer, &communication_uart_rx_buffer,
+                                                           115200, uart_config::DataBits::eight,
+                                                           uart_config::StopBits::one, uart_config::Parity::none);
+
 // ------------------------------ DEBUG UART ------------------------------
 utils::RingBuffer<128>           debug_uart_tx_buffer;
 utils::RingBuffer<128>           debug_uart_rx_buffer;
-drivers::BufferedAsyncUartDriver debug_uart(hw_mappings::K_DEBUG_UART_INSTANCE, &debug_uart_tx_buffer,
-                                            &debug_uart_rx_buffer, 115200, uart_config::DataBits::eight,
-                                            uart_config::StopBits::one, uart_config::Parity::none);
+drivers::BufferedAsyncUartDriver debug_uart_driver(hw_mappings::K_DEBUG_UART_INSTANCE, &debug_uart_tx_buffer,
+                                                   &debug_uart_rx_buffer, 115200, uart_config::DataBits::eight,
+                                                   uart_config::StopBits::one, uart_config::Parity::none);
 
 // --------------------------------- LED ---------------------------------
 drivers::PwmSliceDriver     red_slice_driver(pwm_gpio_to_slice_num(hw_mappings::K_STATUS_LED_RED_PIN));
@@ -58,23 +63,39 @@ parameter_system::ParameterDatabase      parameter_database({parameter_buffer});
 
 // ----------------------------- COMM PROTOCOL --------------------------------
 serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64] = {};
-serial_communication_framework::SlaveHandler protocol_handler({handler_buffer}, debug_uart, sys_clock_driver, 0);
+serial_communication_framework::SlaveHandler             protocol_handler({handler_buffer}, communication_uart_driver,
+                                                                          sys_clock_driver, 0);
 
-void debugUartPutChar(char c) { debug_uart.transmitByte(c); }
-void DebugUartFlush() { debug_uart.flushTx(); }
+void debugUartPutChar(char c) { debug_uart_driver.transmitByte(c); }
+void DebugUartFlush() { debug_uart_driver.flushTx(); }
 
 void initHW() {
     // --------------- INIT UART ---------------
     // Set the TX and RX pins by using the function select on the GPIO
     // Set datasheet for more information on function select
-    gpio_set_function(hw_mappings::K_DEBUG_UART_TX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_TX_PIN));
-    gpio_set_function(hw_mappings::K_DEBUG_UART_RX_PIN, UART_FUNCSEL_NUM(UART_ID, UART_RX_PIN));
 
-    irq_set_exclusive_handler(UART0_IRQ, debugUartCombinedISR);
+    gpio_set_function(hw_mappings::K_SERIAL_COMMUNICATION_UART_TX_PIN,
+                      UART_FUNCSEL_NUM(hw_mappings::K_SERIAL_COMMUNICATION_UART_INSTANCE,
+                                       hw_mappings::K_SERIAL_COMMUNICATION_UART_TX_PIN));
+    gpio_set_function(hw_mappings::K_SERIAL_COMMUNICATION_UART_RX_PIN,
+                      UART_FUNCSEL_NUM(hw_mappings::K_SERIAL_COMMUNICATION_UART_INSTANCE,
+                                       hw_mappings::K_SERIAL_COMMUNICATION_UART_RX_PIN));
+
+    gpio_set_function(hw_mappings::K_DEBUG_UART_TX_PIN,
+                      UART_FUNCSEL_NUM(hw_mappings::K_DEBUG_UART_INSTANCE, hw_mappings::K_DEBUG_UART_TX_PIN));
+    gpio_set_function(hw_mappings::K_DEBUG_UART_RX_PIN,
+                      UART_FUNCSEL_NUM(hw_mappings::K_DEBUG_UART_INSTANCE, hw_mappings::K_DEBUG_UART_RX_PIN));
+
+    irq_set_exclusive_handler(communication_uart_driver.getNvicCombinedUartInterruptNumber(),
+                              serialCommunicationUartCombinedISR);
     // Enable the UART IRQ in the NVIC
-    irq_set_enabled(UART0_IRQ, true);
+    irq_set_enabled(communication_uart_driver.getNvicCombinedUartInterruptNumber(), true);
+    irq_set_exclusive_handler(debug_uart_driver.getNvicCombinedUartInterruptNumber(), debugUartCombinedISR);
+    // Enable the UART IRQ in the NVIC
+    irq_set_enabled(debug_uart_driver.getNvicCombinedUartInterruptNumber(), true);
 
-    debug_uart.init();
+    debug_uart_driver.init();
+    communication_uart_driver.init();
 
     // --------------- INIT LED PWM ---------------
     gpio_set_function(hw_mappings::K_STATUS_LED_RED_PIN, GPIO_FUNC_PWM);
@@ -83,7 +104,7 @@ void initHW() {
     // initializes the PWM:s for color control
     led_driver.init();
     led_driver.turnOn();
-    led_driver.setBrightness(25);
+    led_driver.setBrightness(5);
 
     // --------------- INIT LED TIMER ---------------
     led_update_timer.configureInMilliseconds(20);  // Lowering this increases the accuracy of led effects
@@ -210,12 +231,18 @@ int main() {
 
     /// ************************* MAIN LOOP ************************* ///
     while (true) {
-        /*
-        while (uart0_controller.getReceivedBytesAvailableAmount() > 0) {
-            status_led_controller.flashOverrideColor(led_controller::common_colors::K_ORANGE);
-            uart0_controller.transmitByte(uart0_controller.readReceivedByte());
-        }*/
         protocol_handler.run();
+
+        /* // Old debugging code that can be removed later
+        while (communication_uart_driver.getReceivedBytesAvailableAmount() > 0) {
+            status_led_controller.flashOverrideColor(led_controller::common_colors::K_ORANGE);
+            communication_uart_driver.transmitByte(communication_uart_driver.readReceivedByte());
+        }
+
+        while (debug_uart_driver.getReceivedBytesAvailableAmount() > 0) {
+            status_led_controller.flashOverrideColor(led_controller::common_colors::K_GREEN);
+            debug_uart_driver.transmitByte(debug_uart_driver.readReceivedByte());
+        }*/
     }
 
     return 0;

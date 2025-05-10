@@ -1,10 +1,12 @@
 #ifndef BUFFEREDASYNCUARTDRIVER_H
 #define BUFFEREDASYNCUARTDRIVER_H
 
+#include <hardware/irq.h>
 #include <hardware/uart.h>
 
 #include <cstdint>
 
+#include "assert/assert.h"
 #include "drivers/interfaces/BufferedSerialCommunicationInterface.h"
 #include "utils/RingBuffer.h"
 
@@ -114,6 +116,19 @@ public:
     void handleTxInterrupt();
     /** @brief Handle RX interrupt for asynchronous reception. */
     void handleRxInterrupt();
+
+    /**
+     * @brief Get the NVIC interrupt number for the combined UART interrupt of this UART block.
+     *
+     * Picos UART block has multiple individual interrupt sources (RX, TX, error, modem-status, etc.)
+     * which are logically OR-ed together into a single "combined" interrupt output (UARTINTR).  This
+     * combined interrupt is what gets exposed via the NVIC as UART0_IRQ or UART1_IRQ depending on which
+     * UART instance is used.
+     *
+     * @return NVIC interrupt number for the combined UART interrupt (UART0_IRQ or UART1_IRQ).
+     * @note Asserts if called on an unsupported UART instance.
+     */
+    unsigned int getNvicCombinedUartInterruptNumber();
 
 private:
     uart_inst_t* uart_instance_;
@@ -303,6 +318,23 @@ void BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::handleRxInterrupt(
     if (rx_ring_buffer_->isFull()) return;
 
     rx_ring_buffer_->push(uart_getc(uart_instance_));
+}
+
+template <size_t tx_buffer_size, size_t rx_buffer_size>
+unsigned int BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::getNvicCombinedUartInterruptNumber() {
+    // The RP2040/RP2350 combines all UART interrupt sources into a single NVIC line:
+    //   - UARTRXINTR  (receive FIFO trigger)
+    //   - UARTTXINTR  (transmit FIFO trigger)
+    //   - UARTEINTR   (error conditions: framing, parity, break, overrun)
+    //   - UARTMSINTR  (modem status changes)
+    //   - UARTRTINTR (receive timeout)
+    // These are OR-ed into UARTINTR, signalled on UART0_IRQ or UART1_IRQ.
+
+    // Map of the nvic interrupt numbers for the combined interrupts
+    // If there are more uart modules in the mcu they must be added here
+    if (uart_instance_ == uart0) return UART0_IRQ;
+    if (uart_instance_ == uart1) return UART1_IRQ;
+    ASSERT_WITH_MESSAGE(false, "Unknown uart module, cant map to NVIC irq");
 }
 
 }  // namespace drivers
