@@ -18,6 +18,7 @@ target_link_libraries(control_api_windows PUBLIC
         utils
         control_api_template
         drivers_interfaces
+        debug_print
 )
 
 option(SERVO_CORE_CONTROL_API_WINDOWS_COMPORT_DRIVER_DEBUG_PRINTS
