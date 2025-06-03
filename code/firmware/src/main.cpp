@@ -127,7 +127,7 @@ void initSWLibs() {
                                      protocol_handlers::getParamMetaData);
 }
 
-int main() {
+[[noreturn]] int main() {
     initHW();  // TODO can sw libs be initialized first?
     initSWLibs();
 
@@ -232,6 +232,7 @@ int main() {
     /// ************************* MAIN LOOP ************************* ///
     while (true) {
         protocol_handler.run();
+        test_uint32++;
 
         /* // Old debugging code that can be removed later
         while (communication_uart_driver.getReceivedBytesAvailableAmount() > 0) {
