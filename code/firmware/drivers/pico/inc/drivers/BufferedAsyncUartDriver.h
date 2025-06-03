@@ -293,6 +293,7 @@ size_t BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::readReceivedByte
         if (i == rx_ring_buffer_->bytesAvailable()) break;
 
         buffer[i] = rx_ring_buffer_->pop();
+        i++;
     }
 
     uart_set_irqs_enabled(uart_instance_, true, true);
