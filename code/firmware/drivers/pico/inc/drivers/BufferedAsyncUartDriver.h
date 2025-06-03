@@ -163,7 +163,8 @@ BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::BufferedAsyncUartDriver
     : uart_instance_(uart_instance),
       tx_ring_buffer_(tx_buffer),
       rx_ring_buffer_(rx_buffer),
-      constructor_format_config_(data_bits, stop_bits, parity) {}
+      target_baud_rate_(baud_rate),
+      constructor_format_config_{data_bits, stop_bits, parity} {}
 
 template <size_t tx_buffer_size, size_t rx_buffer_size>
 void BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::init() {
