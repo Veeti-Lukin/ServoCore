@@ -1,1 +1,2 @@
 add_subdirectory(pico)
+add_subdirectory(middleware)
