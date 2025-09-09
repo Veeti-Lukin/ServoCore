@@ -4,6 +4,7 @@ add_library(drivers_interfaces
         inc/drivers/interfaces/TimerInterface.h
         inc/drivers/interfaces/ClockInterface.h
         inc/drivers/interfaces/I2CMasterInterface.h
+        inc/drivers/interfaces/AbsoluteRotatoryEncoderInterface.h
 )
 
 set_target_properties(drivers_interfaces PROPERTIES LINKER_LANGUAGE CXX)
