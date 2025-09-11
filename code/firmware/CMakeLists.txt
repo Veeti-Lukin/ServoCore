@@ -20,9 +20,9 @@ add_executable(ServoCore_firmware
 target_include_directories(ServoCore_firmware PRIVATE inc)
 target_link_libraries(ServoCore_firmware PUBLIC
         pico_stdlib
-        hardware_pwm
 
         drivers_pico
+        drivers_middleware
         utils
         debug_print
         led_controller

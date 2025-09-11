@@ -10,9 +10,11 @@
 #include "debug_print/debug_print.h"
 #include "drivers/AnalogRgbLedDriver.h"
 #include "drivers/BufferedAsyncUartDriver.h"
+#include "drivers/I2CMasterDriver.h"
 #include "drivers/PwmSliceDriver.h"
 #include "drivers/SysClockDriver.h"
 #include "drivers/TimerDriver.h"
+#include "drivers/middleware/AS5600_MagneticEncoderI2cDriver.h"
 #include "hw_mappings.h"
 #include "interrupt_service_routines.h"
 #include "led_controller/LedController.h"
@@ -67,6 +69,10 @@ serial_communication_framework::OperationCodeHandlerInfo handler_buffer[64] = {}
 serial_communication_framework::SlaveHandler             protocol_handler({handler_buffer}, communication_uart_driver,
                                                                           sys_clock_driver, 0);
 
+// ------------------------------- ENCODER ----------------------------------
+drivers::I2CMasterDriver                             encoder_i2c(i2c1, 100'000);
+drivers::middleware::AS5600_MagneticEncoderI2cDriver encoder(&encoder_i2c);
+
 void debugUartPutChar(char c) { debug_uart_driver.transmitByte(c); }
 void DebugUartFlush() { debug_uart_driver.flushTx(); }
 
@@ -112,6 +118,15 @@ void initHW() {
     irq_set_exclusive_handler(led_update_timer.getIrqNumber(), periodicLedUpdateTimerISR);
     irq_set_enabled(led_update_timer.getIrqNumber(), true);
     led_update_timer.start();
+
+    // ------------------ INIT ENCODER ------------------
+    gpio_set_function(hw_mappings::K_ENCODER_READER_I2C_SCL_PIN, GPIO_FUNC_I2C);
+    gpio_set_function(hw_mappings::K_ENCODER_READER_I2C_SDA_PIN, GPIO_FUNC_I2C);
+    // These pullups substitute during development time but on the PCBA there should be externals
+    gpio_pull_up(hw_mappings::K_ENCODER_READER_I2C_SCL_PIN);
+    gpio_pull_up(hw_mappings::K_ENCODER_READER_I2C_SDA_PIN);
+    encoder_i2c.init();
+    encoder.init();  // < Sets the correct i2c speed etc
 
     // --------------- INIT COMMUNICATION ---------------
     protocol_handler.init();

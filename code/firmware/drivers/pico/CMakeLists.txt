@@ -33,8 +33,8 @@ target_link_libraries(drivers_pico PRIVATE
         assert
 )
 
-#Link privately pico sdk libraries
-target_link_libraries(drivers_pico PRIVATE
+#Link publicly pico sdk libraries
+target_link_libraries(drivers_pico PUBLIC
         pico_stdlib
         hardware_pwm
         hardware_i2c
