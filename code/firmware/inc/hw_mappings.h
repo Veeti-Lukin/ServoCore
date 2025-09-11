@@ -2,6 +2,7 @@
 #define HW_MAPPINGS_H
 
 #include <drivers/TimerDriver.h>
+#include <hardware/i2c.h>
 #include <hardware/timer.h>
 #include <hardware/uart.h>
 
@@ -21,6 +22,10 @@ constexpr unsigned int K_STATUS_LED_BLUE_PIN        = 13;
 
 const auto     K_PERIODIC_LED_TIMER_INSTANCE        = timer_hw;
 constexpr auto K_PERIODIC_LED_TIMER_ALARM_CHANNEL   = drivers::TimerAlarmChannel::alarm3;
+
+const auto     K_ENCODER_READER_I2C                 = i2c1;
+constexpr auto K_ENCODER_READER_I2C_SCL_PIN         = 27;
+constexpr auto K_ENCODER_READER_I2C_SDA_PIN         = 26;
 
 }  // namespace hw_mappings
 
