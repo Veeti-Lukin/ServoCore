@@ -6,9 +6,9 @@
 
 namespace parameter_system {
 
-using ParameterID                        = uint8_t;
-using ParameterOnChangeCallback = void (*)();
-constexpr ParameterID K_MAX_PARAMETER_ID = std::numeric_limits<ParameterID>::max();
+using ParameterID                                         = uint8_t;
+using ParameterOnChangeCallback                           = void (*)();
+constexpr ParameterID                  K_MAX_PARAMETER_ID = std::numeric_limits<ParameterID>::max();
 
 enum class ParameterType : uint8_t {
     uint8,
@@ -36,7 +36,6 @@ constexpr bool paramTypeIsNumeric(ParameterType type) {
 
 enum class ReadWriteAccess : uint8_t {
     read_only,
-    write_only,
     read_write,
 };
 
@@ -85,8 +84,6 @@ inline const char* mapReadWriteAccessToString(ReadWriteAccess read_write_access)
     switch (read_write_access) {
         case ReadWriteAccess::read_only:
             return "read_only";
-        case ReadWriteAccess::write_only:
-            return "write_only";
         case ReadWriteAccess::read_write:
             return "read_write";
         default:

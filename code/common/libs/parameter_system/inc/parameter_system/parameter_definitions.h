@@ -7,7 +7,7 @@
 #include "assert/assert.h"
 #include "parameter_system/ParameterDeclaration.h"
 #include "parameter_system/abstract_parameter_definitions.h"
-#include "parameter_system/definitions.h"
+#include "parameter_system/common_defines.h"
 #include "parameter_system/parameter_type_mappings.h"
 
 namespace parameter_system {

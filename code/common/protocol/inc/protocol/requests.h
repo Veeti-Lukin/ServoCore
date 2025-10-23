@@ -5,7 +5,7 @@
 #include <cstring>
 #include <span>
 
-#include "parameter_system/definitions.h"
+#include "parameter_system/common_defines.h"
 #include "parameter_system/parameter_type_mappings.h"
 #include "protocol/operation_codes.h"
 #include "serial_communication_framework/packets.h"

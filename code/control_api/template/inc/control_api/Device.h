@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include "parameter_system/ParameterDeclaration.h"
-#include "parameter_system/definitions.h"
+#include "parameter_system/common_defines.h"
 #include "parameter_system/parameter_type_mappings.h"
 #include "protocol/commands.h"
 #include "protocol/requests.h"

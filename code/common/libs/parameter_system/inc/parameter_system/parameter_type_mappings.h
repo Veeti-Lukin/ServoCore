@@ -1,7 +1,7 @@
 #ifndef PARAMETER_TYPE_MAPPINGS_H
 #define PARAMETER_TYPE_MAPPINGS_H
 
-#include <parameter_system/definitions.h>
+#include <parameter_system/common_defines.h>
 
 #include <cstdint>
 

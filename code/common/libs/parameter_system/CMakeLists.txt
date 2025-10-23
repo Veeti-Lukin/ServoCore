@@ -7,7 +7,7 @@ add_library(parameter_system STATIC
 
         inc/parameter_system/parameter_type_mappings.h
 
-        inc/parameter_system/definitions.h
+        inc/parameter_system/common_defines.h
 
         inc/parameter_system/ParameterDeclaration.h
 )

@@ -3,7 +3,7 @@
 #include <cstring>
 
 #include "parameter_system/ParameterDatabase.h"
-#include "parameter_system/definitions.h"
+#include "parameter_system/common_defines.h"
 #include "protocol/requests.h"
 
 extern parameter_system::ParameterDatabase parameter_database;

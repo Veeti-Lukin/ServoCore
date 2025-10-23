@@ -29,10 +29,7 @@ public:
      *        Must be checked explicitly before trying to write to value or setters might assert
      * @return True if writable, false otherwise.
      */
-    [[nodiscard]] bool valueIsWritable() const {
-        return meta_data_.read_write_access == ReadWriteAccess::write_only ||
-               meta_data_.read_write_access == ReadWriteAccess::read_write;
-    }
+    [[nodiscard]] bool valueIsWritable() const { return meta_data_.read_write_access == ReadWriteAccess::read_write; }
 
     virtual void setValueRaw(std::span<uint8_t> buff)        = 0;
 

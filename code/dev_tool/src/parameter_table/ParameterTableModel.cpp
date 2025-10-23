@@ -1,7 +1,7 @@
 #include "parameter_table/ParameterTableModel.h"
 
 #include "helpers.h"
-#include "parameter_system/definitions.h"
+#include "parameter_system/common_defines.h"
 
 namespace parameter_table {
 
