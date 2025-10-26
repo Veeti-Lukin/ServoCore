@@ -3,7 +3,7 @@
 #include <cstring>
 
 #include "parameter_system/ParameterDatabase.h"
-#include "parameter_system/common_defines.h"
+#include "parameter_system/common.h"
 #include "protocol/requests.h"
 
 extern parameter_system::ParameterDatabase parameter_database;
@@ -18,7 +18,7 @@ ResponseData getParamIds(std::span<std::uint8_t> request_data) {
     protocol::requests::GetRegisteredParameterIds::ResponsePayload response_payload;
 
     for (size_t i = 0; i < parameter_database.getAmountOfRegisteredParameters(); i++) {
-        parameter_system::AbstractParameterDefinition* param_delegate =
+        parameter_system::ParameterDefinition* param_delegate =
             parameter_database.getParameterDefinitionByIndex(i);
         response_payload.registered_parameter_ids.pushBack(param_delegate->getMetaData().id);
     }
@@ -33,7 +33,7 @@ ResponseData getParamMetaData(std::span<std::uint8_t> request_data) {
 
     protocol::requests::GetParameterMetaData::RequestPayload request(request_data);
 
-    parameter_system::AbstractParameterDefinition* param_delegate =
+    parameter_system::ParameterDefinition* param_delegate =
         parameter_database.getParameterDefinitionById(request.parameter_id);
 
     // Parameter not found
@@ -48,21 +48,16 @@ ResponseData getParamMetaData(std::span<std::uint8_t> request_data) {
         .response_data = protocol::requests::GetParameterMetaData::ResponsePayload(parameter_meta_data).serialize()};
 }
 
-
 ResponseData getParamValue(std::span<std::uint8_t> request_data) {
     protocol::requests::ReadParameterValue::RequestPayload request(request_data);
 
-    parameter_system::AbstractParameterDefinition* param = parameter_database.getParameterDefinitionById(request.id);
+    parameter_system::ParameterDefinition* param = parameter_database.getParameterDefinitionById(request.id);
     // Parameter not found
     if (param == nullptr) {
         return {.response_code = serial_communication_framework::ResponseCode::invalid_arguments, .response_data = {}};
     }
 
-    if (!param->valueIsReadable()) {
-        return {serial_communication_framework::ResponseCode::not_allowed, {}};
-    }
-
-    if (param->getMetaData().type != request.target_type) {
+    if (param->getMetaData().value_type != request.target_type) {
         return {serial_communication_framework::ResponseCode::type_mismatch, {}};
     }
 

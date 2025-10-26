@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include "parameter_system/ParameterDeclaration.h"
-#include "parameter_system/common_defines.h"
+#include "parameter_system/common.h"
 #include "parameter_system/parameter_type_mappings.h"
 #include "protocol/commands.h"
 #include "protocol/requests.h"
@@ -44,17 +44,16 @@ public:
     utils::StaticList<ParameterID, parameter_system::K_MAX_PARAMETER_ID> getRegisteredParameterIds();
     ParameterMetaData                                                    getParameterMetaData(ParameterID id);
 
-    template <ParameterDeclaration T_Declaration>
-    auto readParameterValue(T_Declaration parameter_declaration) {
+    template <parameter_system::ParameterValueType T_ValueType>
+    auto readParameterValue(const parameter_system::ParameterDeclaration<T_ValueType>& parameter_declaration) {
         using serial_communication_framework::ResponseCode;
         using serial_communication_framework::ResponseData;
 
-        using CppType         = typename parameter_system::MapParameterTypeToCppType<T_Declaration::param_type>::type;
+        using CppType         = typename parameter_system::MapParameterValueTypeToCppType<T_ValueType>::type;
 
         ResponseData response = communication_handler_->sendRequestAndReceiveResponseBlocking(
             device_id_, protocol::requests::ReadParameterValue::op_code,
-            protocol::requests::ReadParameterValue::RequestPayload(parameter_declaration.id, T_Declaration::param_type)
-                .serialize());
+            protocol::requests::ReadParameterValue::RequestPayload(parameter_declaration.id, T_ValueType).serialize());
 
         if (response.response_code != ResponseCode::ok) {
             return CppType();
@@ -70,7 +69,7 @@ public:
 
     template <ParameterDeclaration T_Declaration>
     auto writeParameterValue(T_Declaration parameter_declaration) {
-        using CppType = typename parameter_system::MapParameterTypeToCppType<T_Declaration::param_type>::type;
+        using CppType = typename parameter_system::MapParameterValueTypeToCppType<T_Declaration::param_type>::type;
 
         return CppType();
     }

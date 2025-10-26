@@ -1,7 +1,7 @@
 #ifndef COMMON_PROTOCOL_PARAMETER_IDS_H
 #define COMMON_PROTOCOL_PARAMETER_IDS_H
 
-#include "parameter_system/common_defines.h"
+#include "parameter_system/common.h"
 
 namespace protocol {
 

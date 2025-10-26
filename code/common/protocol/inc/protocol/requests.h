@@ -5,7 +5,7 @@
 #include <cstring>
 #include <span>
 
-#include "parameter_system/common_defines.h"
+#include "parameter_system/common.h"
 #include "parameter_system/parameter_type_mappings.h"
 #include "protocol/operation_codes.h"
 #include "serial_communication_framework/packets.h"
@@ -82,11 +82,11 @@ struct ReadParameterValue {
 
     struct RequestPayload : PayloadBase<RequestPayload> {
         parameter_system::ParameterID   id = {};
-        parameter_system::ParameterType target_type;
+        parameter_system::ParameterValueType target_type;
 
                  RequestPayload() = default;
         explicit RequestPayload(std::span<uint8_t> buffer);
-        explicit RequestPayload(parameter_system::ParameterID id, parameter_system::ParameterType type)
+        explicit RequestPayload(parameter_system::ParameterID id, parameter_system::ParameterValueType type)
             : id(id), target_type(type) {}
         utils::StaticList<uint8_t, K_PAYLOAD_MAX_SIZE> serialize() override;
     };

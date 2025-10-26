@@ -1,7 +1,7 @@
 #include "parameter_table/ParameterTableModel.h"
 
 #include "helpers.h"
-#include "parameter_system/common_defines.h"
+#include "parameter_system/common.h"
 
 namespace parameter_table {
 
@@ -32,13 +32,9 @@ QVariant ParameterTableModel::data(const QModelIndex& index, int role) const {
                 return row.meta_data.name;
             case static_cast<int>(Columns::access):
                 return parameter_system::mapReadWriteAccessToString(row.meta_data.read_write_access);
-            case static_cast<int>(Columns::type):
-                return parameter_system::mapParameterTypeToString(row.meta_data.type);
+            case static_cast<int>(Columns::value_type):
+                return parameter_system::mapParameterTypeToString(row.meta_data.value_type);
             case static_cast<int>(Columns::value):
-                // Check if parameter is write-only, if so return empty QVariant
-                if (row.meta_data.read_write_access == parameter_system::ReadWriteAccess::write_only) {
-                    return {};  // Hide value
-                }
                 return row.value;
         }
     }
@@ -60,7 +56,7 @@ QVariant ParameterTableModel::headerData(int section, Qt::Orientation orientatio
             return "Name";
         case static_cast<int>(Columns::access):
             return "Access";
-        case static_cast<int>(Columns::type):
+        case static_cast<int>(Columns::value_type):
             return "Type";
         case static_cast<int>(Columns::value):
             return "Value";
@@ -75,8 +71,7 @@ Qt::ItemFlags ParameterTableModel::flags(const QModelIndex& index) const {
     // flags for the value column
     if (index.column() == static_cast<size_t>(Columns::value)) {
         RowData row                = rows_[index.row()];
-        bool parameter_is_editable = row.meta_data.read_write_access == parameter_system::ReadWriteAccess::read_write ||
-                                     row.meta_data.read_write_access == parameter_system::ReadWriteAccess::write_only;
+        bool parameter_is_editable = row.meta_data.read_write_access == parameter_system::ReadWriteAccess::read_write;
 
         if (parameter_is_editable) return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
         // if not editable default to these flags
@@ -119,7 +114,7 @@ void ParameterTableModel::sort(int column_index, Qt::SortOrder order) {
                 return compare(left.meta_data.read_write_access, right.meta_data.read_write_access);
             });
             break;
-        case Columns::type:
+        case Columns::value_type:
             std::sort(rows_.begin(), rows_.end(), [compare](const RowData& left, const RowData& right) {
                 return compare(left.meta_data.type, right.meta_data.type);
             });

@@ -22,7 +22,7 @@ GetParameterMetaData::ResponsePayload::ResponsePayload(std::span<uint8_t> buffer
     meta_data                   = {};
 
     meta_data.id                = buffer[0];
-    meta_data.type              = static_cast<parameter_system::ParameterType>(buffer[1]);
+    meta_data.value_type        = static_cast<parameter_system::ParameterValueType>(buffer[1]);
     meta_data.read_write_access = static_cast<parameter_system::ReadWriteAccess>(buffer[2]);
 
     size_t   name_length        = buffer.size_bytes() - 3;
@@ -49,7 +49,7 @@ utils::StaticList<uint8_t, K_PAYLOAD_MAX_SIZE> GetParameterMetaData::ResponsePay
 
 ReadParameterValue::RequestPayload::RequestPayload(std::span<uint8_t> buffer) {
     id          = buffer[0];
-    target_type = static_cast<parameter_system::ParameterType>(buffer[1]);
+    target_type = static_cast<parameter_system::ParameterValueType>(buffer[1]);
 }
 
 utils::StaticList<uint8_t, K_PAYLOAD_MAX_SIZE> ReadParameterValue::RequestPayload::serialize() {

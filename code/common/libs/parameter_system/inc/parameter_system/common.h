@@ -11,6 +11,12 @@ using ParameterOnChangeCallback                           = void (*)();
 constexpr ParameterID                  K_MAX_PARAMETER_ID = std::numeric_limits<ParameterID>::max();
 
 enum class ParameterType : uint8_t {
+    saved_parameter,    ///< Device won't change by itself, value saved between the reboots
+    runtime_parameter,  ///< Device won't change by itself, value resets between the reboots
+    signal,             ///< Only changed by the device, always read only
+};
+
+enum class ParameterValueType : uint8_t {
     uint8,
     uint16,
     uint32,
@@ -30,8 +36,8 @@ enum class ParameterType : uint8_t {
     none,
 };
 
-constexpr bool paramTypeIsNumeric(ParameterType type) {
-    return type >= ParameterType::FIRST_NUMERIC && type <= ParameterType::LAST_NUMERIC;
+constexpr bool paramTypeIsNumeric(ParameterValueType type) {
+    return type >= ParameterValueType::FIRST_NUMERIC && type <= ParameterValueType::LAST_NUMERIC;
 }
 
 enum class ReadWriteAccess : uint8_t {
@@ -39,40 +45,47 @@ enum class ReadWriteAccess : uint8_t {
     read_write,
 };
 
+enum class ReadWriteResult : uint8_t {
+    ok,
+    buffer_size_mismatch,
+    not_allowed,
+};
+
 struct ParameterMetaData {
     static constexpr size_t K_PARAMETER_NAME_MAX_LENGTH = 52;
 
-    ParameterID     id;
-    ParameterType   type;
-    ReadWriteAccess read_write_access;
-    char            name[K_PARAMETER_NAME_MAX_LENGTH];
+    ParameterID        id;
+    ParameterType      type;
+    ParameterValueType value_type;
+    ReadWriteAccess    read_write_access;
+    char               name[K_PARAMETER_NAME_MAX_LENGTH];
 };
 
-inline const char* mapParameterTypeToString(ParameterType param_type) {
+inline const char* mapParameterTypeToString(ParameterValueType param_type) {
     switch (param_type) {
-        case ParameterType::uint8:
+        case ParameterValueType::uint8:
             return "uint8";
-        case ParameterType::uint16:
+        case ParameterValueType::uint16:
             return "uint16";
-        case ParameterType::uint32:
+        case ParameterValueType::uint32:
             return "uint32";
-        case ParameterType::uint64:
+        case ParameterValueType::uint64:
             return "uint64";
-        case ParameterType::int8:
+        case ParameterValueType::int8:
             return "int8";
-        case ParameterType::int16:
+        case ParameterValueType::int16:
             return "int16";
-        case ParameterType::int32:
+        case ParameterValueType::int32:
             return "int32";
-        case ParameterType::int64:
+        case ParameterValueType::int64:
             return "int64";
-        case ParameterType::floating_point:
+        case ParameterValueType::floating_point:
             return "floating_point";
-        case ParameterType::double_float:
+        case ParameterValueType::double_float:
             return "double_float";
-        case ParameterType::boolean:
+        case ParameterValueType::boolean:
             return "boolean";
-        case ParameterType::none:
+        case ParameterValueType::none:
             return "none";
 
         default:

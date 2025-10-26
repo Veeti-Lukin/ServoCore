@@ -3,40 +3,40 @@
 #include "assert/assert.h"
 
 namespace parameter_system {
-ParameterDatabase::ParameterDatabase(std::span<AbstractParameterDefinition*> buffer) : buffer_(buffer) {}
+ParameterDatabase::ParameterDatabase(std::span<ParameterDefinition*> buffer) : buffer_(buffer) {}
 
-void ParameterDatabase::registerParameter(AbstractParameterDefinition* parameter_delegate) {
-    ASSERT(parameter_delegate != nullptr);
+void ParameterDatabase::registerParameter(ParameterDefinition* parameter_definition) {
+    ASSERT(parameter_definition != nullptr);
     ASSERT_WITH_MESSAGE(param_registering_index_ < buffer_.size(),
                         "Parameter registering index out of bounds. Buffer too small");
-    ASSERT_WITH_MESSAGE(getParameterDefinitionById(parameter_delegate->getMetaData().id) == nullptr,
+    ASSERT_WITH_MESSAGE(getParameterDefinitionById(parameter_definition->getMetaData().id) == nullptr,
                         "Parameter already registered with the same id");
-    buffer_[param_registering_index_] = parameter_delegate;
+    buffer_[param_registering_index_] = parameter_definition;
     param_registering_index_++;
 }
 
 size_t ParameterDatabase::getAmountOfRegisteredParameters() const { return param_registering_index_; }
 
-AbstractParameterDefinition* ParameterDatabase::getParameterDefinitionById(ParameterID id) const {
-    for (AbstractParameterDefinition* delegate : buffer_) {
-        if (delegate == nullptr) continue;
+ParameterDefinition* ParameterDatabase::getParameterDefinitionById(ParameterID id) const {
+    for (ParameterDefinition* definition : buffer_) {
+        if (definition == nullptr) continue;
 
-        if (delegate->getMetaData().id == id) {
-            return delegate;
+        if (definition->getMetaData().id == id) {
+            return definition;
         }
     }
 
     return nullptr;
 }
 
-AbstractParameterDefinition* ParameterDatabase::getParameterDefinitionByIndex(size_t index) const {
+ParameterDefinition* ParameterDatabase::getParameterDefinitionByIndex(size_t index) const {
     if (index >= param_registering_index_) {
         return nullptr;
     }
 
     return buffer_[index];
 }
-std::span<AbstractParameterDefinition*> ParameterDatabase::getParameterDelegates() const {
+std::span<ParameterDefinition*> ParameterDatabase::getParameterDefinitions() const {
     return buffer_.subspan(0, param_registering_index_);
 }
 

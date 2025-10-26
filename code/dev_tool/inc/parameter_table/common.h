@@ -4,16 +4,16 @@
 #include <QVariant>
 #include <cstdint>
 
-#include "parameter_system/parameter_definitions.h"
+#include "parameter_system/common.h"
 
 namespace parameter_table {
 
 enum class Columns : size_t {
-    id     = 0,
-    name   = 1,
-    access = 2,
-    type   = 3,
-    value  = 4,
+    id         = 0,
+    name       = 1,
+    access     = 2,
+    value_type = 3,
+    value      = 4,
 };
 
 static constexpr size_t K_COLUMN_COUNT = 5;

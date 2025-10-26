@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include "parameter_system/common_defines.h"
+#include "parameter_system/common.h"
 #include "protocol/requests.h"
 
 namespace servo_core_control_api {

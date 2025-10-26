@@ -22,15 +22,15 @@ QWidget* ParameterValueDelegate::createEditor(QWidget* parent, const QStyleOptio
 
     const RowData& row = rows_[index.row()];
 
-    switch (row.meta_data.type) {
-        case parameter_system::ParameterType::uint8:
-        case parameter_system::ParameterType::uint16:
-        case parameter_system::ParameterType::uint32:
-        case parameter_system::ParameterType::uint64:
-        case parameter_system::ParameterType::int8:
-        case parameter_system::ParameterType::int16:
-        case parameter_system::ParameterType::int32:
-        case parameter_system::ParameterType::int64: {
+    switch (row.meta_data.value_type) {
+        case parameter_system::ParameterValueType::uint8:
+        case parameter_system::ParameterValueType::uint16:
+        case parameter_system::ParameterValueType::uint32:
+        case parameter_system::ParameterValueType::uint64:
+        case parameter_system::ParameterValueType::int8:
+        case parameter_system::ParameterValueType::int16:
+        case parameter_system::ParameterValueType::int32:
+        case parameter_system::ParameterValueType::int64: {
             QDoubleSpinBox* editor = new QDoubleSpinBox(parent);
             editor->setDecimals(0);    // Prevents floating-point numbers
             editor->setSingleStep(1);  // Ensure only whole numbers increment
@@ -42,18 +42,18 @@ QWidget* ParameterValueDelegate::createEditor(QWidget* parent, const QStyleOptio
             editor->setMaximum(std::numeric_limits<uint64_t>::max());
             return editor;
         }
-        case parameter_system::ParameterType::floating_point:
-        case parameter_system::ParameterType::double_float: {
+        case parameter_system::ParameterValueType::floating_point:
+        case parameter_system::ParameterValueType::double_float: {
             QDoubleSpinBox* editor = new QDoubleSpinBox(parent);
-            editor->setMinimum(std::numeric_limits<parameter_system::MapParameterTypeToCppType<
-                                   parameter_system::ParameterType::double_float>::type>::min());
-            editor->setMaximum(std::numeric_limits<parameter_system::MapParameterTypeToCppType<
-                                   parameter_system::ParameterType::double_float>::type>::max());
+            editor->setMinimum(std::numeric_limits<parameter_system::MapParameterValueTypeToCppType<
+                                   parameter_system::ParameterValueType::double_float>::type>::min());
+            editor->setMaximum(std::numeric_limits<parameter_system::MapParameterValueTypeToCppType<
+                                   parameter_system::ParameterValueType::double_float>::type>::max());
             editor->setFrame(false);
             return editor;
         }
 
-        case parameter_system::ParameterType::boolean: {
+        case parameter_system::ParameterValueType::boolean: {
             QComboBox* editor = new QComboBox(parent);
             editor->setFrame(false);
             editor->addItem("false", false);
@@ -61,7 +61,7 @@ QWidget* ParameterValueDelegate::createEditor(QWidget* parent, const QStyleOptio
             return editor;
         }
 
-        case parameter_system::ParameterType::none:
+        case parameter_system::ParameterValueType::none:
             break;
     }
 }
@@ -69,39 +69,39 @@ QWidget* ParameterValueDelegate::createEditor(QWidget* parent, const QStyleOptio
 void ParameterValueDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const {
     const RowData& row = rows_[index.row()];
 
-    switch (row.meta_data.type) {
-        case parameter_system::ParameterType::uint8:
-        case parameter_system::ParameterType::uint16:
-        case parameter_system::ParameterType::uint32:
-        case parameter_system::ParameterType::uint64: {
+    switch (row.meta_data.value_type) {
+        case parameter_system::ParameterValueType::uint8:
+        case parameter_system::ParameterValueType::uint16:
+        case parameter_system::ParameterValueType::uint32:
+        case parameter_system::ParameterValueType::uint64: {
             uint64_t        value    = rows_[index.row()].value.value<uint64_t>();
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             spin_box->setValue(value);
             break;
         }
-        case parameter_system::ParameterType::int8:
-        case parameter_system::ParameterType::int16:
-        case parameter_system::ParameterType::int32:
-        case parameter_system::ParameterType::int64: {
+        case parameter_system::ParameterValueType::int8:
+        case parameter_system::ParameterValueType::int16:
+        case parameter_system::ParameterValueType::int32:
+        case parameter_system::ParameterValueType::int64: {
             int64_t         value    = rows_[index.row()].value.value<int64_t>();
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             spin_box->setValue(value);
             break;
         }
-        case parameter_system::ParameterType::floating_point:
-        case parameter_system::ParameterType::double_float: {
+        case parameter_system::ParameterValueType::floating_point:
+        case parameter_system::ParameterValueType::double_float: {
             double          value    = rows_[index.row()].value.value<double>();
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             spin_box->setValue(value);
             break;
         }
-        case parameter_system::ParameterType::boolean: {
+        case parameter_system::ParameterValueType::boolean: {
             bool       value     = rows_[index.row()].value.value<bool>();
             QComboBox* combo_box = static_cast<QComboBox*>(editor);
             combo_box->setCurrentIndex(value);  // 0 false 1 true
             break;
         }
-        case parameter_system::ParameterType::none:
+        case parameter_system::ParameterValueType::none:
             break;
     }
 }
@@ -109,74 +109,74 @@ void ParameterValueDelegate::setEditorData(QWidget* editor, const QModelIndex& i
 void ParameterValueDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const {
     const RowData& row = rows_[index.row()];
 
-    switch (row.meta_data.type) {
-        case parameter_system::ParameterType::uint8: {
+    switch (row.meta_data.value_type) {
+        case parameter_system::ParameterValueType::uint8: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             uint8_t         value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::uint16: {
+        case parameter_system::ParameterValueType::uint16: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             uint16_t        value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::uint32: {
+        case parameter_system::ParameterValueType::uint32: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             uint32_t        value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::uint64: {
+        case parameter_system::ParameterValueType::uint64: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             uint64_t        value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::int8: {
+        case parameter_system::ParameterValueType::int8: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             int8_t          value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::int16: {
+        case parameter_system::ParameterValueType::int16: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             int16_t         value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::int32: {
+        case parameter_system::ParameterValueType::int32: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             int32_t         value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::int64: {
+        case parameter_system::ParameterValueType::int64: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             int64_t         value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::floating_point: {
+        case parameter_system::ParameterValueType::floating_point: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             float           value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::double_float: {
+        case parameter_system::ParameterValueType::double_float: {
             QDoubleSpinBox* spin_box = static_cast<QDoubleSpinBox*>(editor);
             double          value    = spin_box->value();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::boolean: {
+        case parameter_system::ParameterValueType::boolean: {
             QComboBox* combo_box = static_cast<QComboBox*>(editor);
             bool       value     = combo_box->itemData(combo_box->currentIndex()).toBool();
             model->setData(index, value, Qt::EditRole);
             break;
         }
-        case parameter_system::ParameterType::none:
+        case parameter_system::ParameterValueType::none:
             break;
     }
 }

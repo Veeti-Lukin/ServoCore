@@ -18,7 +18,7 @@
 #include "led_controller/LedController.h"
 #include "led_controller/common_colors.h"
 #include "parameter_system/ParameterDatabase.h"
-#include "parameter_system/parameter_definitions.h"
+#include "parameter_system/definition_helpers.h"
 #include "protocol/commands.h"
 #include "protocol/parameters.h"
 #include "protocol/requests.h"
@@ -59,7 +59,7 @@ led_controller::LedController status_led_controller(&led_driver);
 drivers::TimerDriver led_update_timer(hw_mappings::K_PERIODIC_LED_TIMER_INSTANCE,
                                       hw_mappings::K_PERIODIC_LED_TIMER_ALARM_CHANNEL);
 // ----------------------------- PARAMETER SYSTEM ------------------------------
-parameter_system::AbstractParameterDefinition* parameter_buffer[64] = {nullptr};
+parameter_system::ParameterDefinition* parameter_buffer[64] = {nullptr};
 parameter_system::ParameterDatabase            parameter_database({parameter_buffer});
 
 // ----------------------------- COMM PROTOCOL --------------------------------
@@ -140,101 +140,20 @@ void initSWLibs() {
     uint32_t test_uint32 = 123456;
     float    test_float  = 3.1415;
     bool     test_bool   = true;
+    uint64_t test_uint64 = 123456;
 
-    parameter_system::ParamUint8  param1(protocol::test_params::test_uint8,
-                                         parameter_system::ReadWriteAccess::read_write, "Test Uint8", test_uint8);
-    parameter_system::ParamUint16 param2(protocol::test_params::test_uint16,
-                                         parameter_system::ReadWriteAccess::read_only, "Test Uint16", test_uint16);
-    parameter_system::ParamUint32 param3(protocol::test_params::test_uint32,
-                                         parameter_system::ReadWriteAccess::read_write, "Test Uint32", test_uint32);
-    parameter_system::ParamFloat param4(protocol::test_params::test_float, parameter_system::ReadWriteAccess::read_only,
-                                        "Test Float", test_float);
-    parameter_system::ParamBoolean param5(protocol::test_params::test_bool,
-                                          parameter_system::ReadWriteAccess::read_write, "Test Bool", test_bool);
+    parameter_system::SavedParameter   param1(protocol::test_params::test_uint8, "Test Uint8", test_uint8);
+    parameter_system::SignalParameter  param2(protocol::test_params::test_uint16, "Test Uint16", test_uint16);
+    parameter_system::RuntimeParameter param3(protocol::test_params::test_uint32, "Test Uint32", test_uint32);
+    parameter_system::SignalParameter  param4(protocol::test_params::test_float, "Test Float", test_float);
+    parameter_system::RuntimeParameter param5(protocol::test_params::test_bool, "Test Bool", test_bool);
+    parameter_system::RuntimeParameter param6(protocol::test_params::test_test, "Test U64", test_uint64);
 
     parameter_database.registerParameter(&param1);
     parameter_database.registerParameter(&param2);
     parameter_database.registerParameter(&param3);
     parameter_database.registerParameter(&param4);
     parameter_database.registerParameter(&param5);
-
-    for (parameter_system::AbstractParameterDefinition* parameter : parameter_database.getParameterDelegates()) {
-        const parameter_system::ParameterMetaData meta_data = parameter->getMetaData();
-        DEBUG_PRINT("ID: % Name: % RW: % TYPE: % ", meta_data.id, meta_data.name, (uint8_t)meta_data.read_write_access,
-                    (uint8_t)meta_data.type);
-        switch (meta_data.type) {
-            case parameter_system::ParameterType::uint8:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDefinitionByIdAs<parameter_system::ParameterType::uint8>(meta_data.id)
-                                ->getValue());
-                break;
-            case parameter_system::ParameterType::uint16:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDefinitionByIdAs<parameter_system::ParameterType::uint16>(meta_data.id)
-                                ->getValue());
-                break;
-            case parameter_system::ParameterType::uint32:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDefinitionByIdAs<parameter_system::ParameterType::uint32>(meta_data.id)
-                                ->getValue());
-                break;
-            case parameter_system::ParameterType::uint64:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDefinitionByIdAs<parameter_system::ParameterType::uint32>(meta_data.id)
-                                ->getValue());
-                break;
-            case parameter_system::ParameterType::int8:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDefinitionByIdAs<parameter_system::ParameterType::int8>(meta_data.id)
-                                ->getValue());
-                break;
-            case parameter_system::ParameterType::int16:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDefinitionByIdAs<parameter_system::ParameterType::int16>(meta_data.id)
-                                ->getValue());
-                break;
-            case parameter_system::ParameterType::int32:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDefinitionByIdAs<parameter_system::ParameterType::int32>(meta_data.id)
-                                ->getValue());
-                break;
-            case parameter_system::ParameterType::int64:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDefinitionByIdAs<parameter_system::ParameterType::int64>(meta_data.id)
-                                ->getValue());
-                break;
-            case parameter_system::ParameterType::floating_point:
-                DEBUG_PRINT(
-                    "Value: %",
-                    parameter_database
-                        .getParameterDefinitionByIdAs<parameter_system::ParameterType::floating_point>(meta_data.id)
-                        ->getValue());
-                break;
-            case parameter_system::ParameterType::double_float:
-                DEBUG_PRINT(
-                    "Value: %",
-                    parameter_database
-                        .getParameterDefinitionByIdAs<parameter_system::ParameterType::double_float>(meta_data.id)
-                        ->getValue());
-                break;
-            case parameter_system::ParameterType::boolean:
-                DEBUG_PRINT("Value: %",
-                            parameter_database
-                                .getParameterDefinitionByIdAs<parameter_system::ParameterType::boolean>(meta_data.id)
-                                ->getValue());
-            default:
-                break;
-        }
-        DEBUG_PRINT("\n");
-    }
 
     /// ************************* MAIN LOOP ************************* ///
     while (true) {

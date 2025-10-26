@@ -5,7 +5,7 @@
 #include <QVector>
 
 #include "common.h"
-#include "parameter_system/common_defines.h"
+#include "parameter_system/common.h"
 
 namespace parameter_table {
 

@@ -75,7 +75,7 @@ QVector<RowData> ParameterTableWidget::fetchParameters() const {
     QVector<RowData> parameters;
     for (uint8_t id : device_->getRegisteredParameterIds()) {
         parameter_system::ParameterMetaData meta_data = device_->getParameterMetaData(id);
-        QVariant                            value     = getParameterValue(id, meta_data.type);
+        QVariant                            value     = getParameterValue(id, meta_data.value_type);
         parameters.push_back({meta_data, value});
     }
 
@@ -84,48 +84,56 @@ QVector<RowData> ParameterTableWidget::fetchParameters() const {
 
 void ParameterTableWidget::refreshParameterValues() {
     using parameter_system::ParameterDeclaration;
-    using parameter_system::ParameterType;
+    using parameter_system::ParameterValueType;
     for (size_t i = 0; i < rows_.size(); i++) {
         RowData&    row              = rows_[i];
-        QVariant    new_value        = getParameterValue(row.meta_data.id, row.meta_data.type);
+        QVariant    new_value        = getParameterValue(row.meta_data.id, row.meta_data.value_type);
         QModelIndex table_cell_index = table_model_->index(i, static_cast<int>(Columns::value));
 
         Q_UNUSED(table_model_->setData(table_cell_index, new_value, Qt::EditRole));
     }
 }
 
-QVariant ParameterTableWidget::getParameterValue(parameter_system::ParameterID   id,
-                                                 parameter_system::ParameterType type) const {
+QVariant ParameterTableWidget::getParameterValue(parameter_system::ParameterID        id,
+                                                 parameter_system::ParameterValueType type) const {
     using parameter_system::ParameterDeclaration;
-    using parameter_system::ParameterType;
+    using parameter_system::ParameterValueType;
 
     switch (type) {
-        case ParameterType::uint8:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterType::uint8>{id}));
-        case ParameterType::uint16:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterType::uint16>{id}));
-        case ParameterType::uint32:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterType::uint32>{id}));
-        case ParameterType::uint64:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterType::uint64>{id}));
-        case ParameterType::int8:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterType::int8>{id}));
-        case ParameterType::int16:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterType::int16>{id}));
-        case ParameterType::int32:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterType::int32>{id}));
-        case ParameterType::int64:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterType::int64>{id}));
-        case ParameterType::floating_point:
+        case ParameterValueType::uint8:
             return QVariant::fromValue(
-                device_->readParameterValue(ParameterDeclaration<ParameterType::floating_point>{id}));
-        case ParameterType::double_float:
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::uint8>{id}));
+        case ParameterValueType::uint16:
             return QVariant::fromValue(
-                device_->readParameterValue(ParameterDeclaration<ParameterType::double_float>{id}));
-        case ParameterType::boolean:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterType::boolean>{id}));
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::uint16>{id}));
+        case ParameterValueType::uint32:
+            return QVariant::fromValue(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::uint32>{id}));
+        case ParameterValueType::uint64:
+            return QVariant::fromValue(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::uint64>{id}));
+        case ParameterValueType::int8:
+            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterValueType::int8>{id}));
+        case ParameterValueType::int16:
+            return QVariant::fromValue(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::int16>{id}));
+        case ParameterValueType::int32:
+            return QVariant::fromValue(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::int32>{id}));
+        case ParameterValueType::int64:
+            return QVariant::fromValue(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::int64>{id}));
+        case ParameterValueType::floating_point:
+            return QVariant::fromValue(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::floating_point>{id}));
+        case ParameterValueType::double_float:
+            return QVariant::fromValue(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::double_float>{id}));
+        case ParameterValueType::boolean:
+            return QVariant::fromValue(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::boolean>{id}));
 
-        case ParameterType::none:
+        case ParameterValueType::none:
             qDebug() << "ParameterTableWidget::getParameterValue"
                      << "unhandled type";
             break;
