@@ -63,6 +63,10 @@ void AnalogRgbLedDriver::setColorRGB(uint8_t red, uint8_t green, uint8_t blue) {
     red_pwm_slice_->setChannelDutyCycle(red_pwm_channel_, red_duty);
     green_pwm_slice_->setChannelDutyCycle(blue_pwm_channel_, green_duty);
     blue_pwm_slice_->setChannelDutyCycle(blue_pwm_channel_, blue_duty);
+
+    current_color_.red   = red;
+    current_color_.green = green;
+    current_color_.blue  = blue;
 }
 
 void AnalogRgbLedDriver::setColorRGB(const RGB rgb) { setColorRGB(rgb.red, rgb.green, rgb.blue); }
@@ -72,6 +76,8 @@ void AnalogRgbLedDriver::setBrightness(float brightness_percentage) {
     if (brightness_percentage < 0) brightness_percentage = 0;
 
     brightness_multiplier_ = brightness_percentage / 100.0f;
+
+    setColorRGB(current_color_);
 }
 
 float AnalogRgbLedDriver::getBrightness() const { return brightness_multiplier_ * 100.0f; }
