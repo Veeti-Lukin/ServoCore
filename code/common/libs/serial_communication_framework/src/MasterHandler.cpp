@@ -19,6 +19,7 @@ MasterHandler::MasterHandler(drivers::interfaces::BufferedSerialCommunicationInt
 void MasterHandler::init() { /* TODO SET THE SERIAL COMMUNICATION SETTINGS */
 }
 
+/*
 ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(
     uint8_t receiver_id, uint8_t operation_code,
     utils::StaticList<uint8_t, RequestPacket::K_PAYLOAD_MAX_SIZE> payload) {
@@ -67,12 +68,14 @@ ResponseData MasterHandler::sendRequestAndReceiveResponseBlocking(
 
     return ResponseData{static_cast<ResponseCode>(response.header.response_code),
                         utils::StaticList<uint8_t, ResponsePacket::K_PAYLOAD_MAX_SIZE>(response.payload)};
-}
+}*/
 
+/*
 void MasterHandler::sendRequestAndReceiveResponseASync(uint8_t receiver_id, uint8_t operation_code,
-                                                       std::span<uint8_t> payload, AsyncCallBack cb) {
+                                                       std::span<uint8_t> payload, void(*cb)) {
     // TODO implement
-}
+}*/
+
 void MasterHandler::run() {
     // TODO implement
 }

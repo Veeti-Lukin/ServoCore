@@ -4,19 +4,20 @@
 #include <QVariant>
 #include <cstdint>
 
-#include "parameter_system/ParameterDelegate.h"
+#include "parameter_system/common.h"
 
 namespace parameter_table {
 
 enum class Columns : size_t {
-    id     = 0,
-    name   = 1,
-    access = 2,
-    type   = 3,
-    value  = 4,
+    id         = 0,
+    name       = 1,
+    category   = 2,
+    access     = 3,
+    value_type = 4,
+    value      = 5,
 };
 
-static constexpr size_t K_COLUMN_COUNT = 5;
+static constexpr size_t K_COLUMN_COUNT = 6;
 
 struct RowData {
     parameter_system::ParameterMetaData meta_data;

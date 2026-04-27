@@ -1,18 +1,18 @@
 #ifndef serial_communication_framework_OP_CODE_HANDLERS_H
 #define serial_communication_framework_OP_CODE_HANDLERS_H
 
+#include "protocol/commands.h"
 #include "serial_communication_framework/SlaveHandler.h"
 
 namespace protocol_handlers {
 
-using serial_communication_framework::ResponseData;
+protocol::commands::ReadParamValueResponse   readParamValue(const protocol::commands::ReadParamValueRequest& request);
+protocol::commands::EmptyResponse            writeParamValue(const protocol::commands::WriteParamValueRequest& request);
+protocol::commands::GetParamMetadataResponse getParamMetaData(
+    const protocol::commands::GetParamMetadataRequest& request);
 
-ResponseData ping(std::span<std::uint8_t> request_data);
-
-ResponseData getParamIds(std::span<std::uint8_t> request_data);
-ResponseData getParamMetaData(std::span<std::uint8_t> request_data);
-ResponseData setParamValue(std::span<std::uint8_t> request_data);
-ResponseData getParamValue(std::span<std::uint8_t> request_data);
+protocol::commands::GetRegisteredParamIdsResponse getParamIds(const protocol::commands::EmptyRequest& request);
+protocol::commands::EmptyResponse                 ping(const protocol::commands::EmptyRequest& request);
 
 }  // namespace protocol_handlers
 

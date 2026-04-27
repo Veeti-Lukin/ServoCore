@@ -1,16 +1,21 @@
 #ifndef COMMON_PROTOCOL_COMMANDS_H
 #define COMMON_PROTOCOL_COMMANDS_H
 
-#include <cstdint>
+/** This file just includes all the command files so that it is easier to import the commands to some other place */
 
-#include "protocol/operation_codes.h"
+// Expose the EmptyResponse and EmptyRequest in to same namespace as the other request/response types
+#include "serial_communication_framework/command_interface.h"
+namespace protocol::commands {
 
-namespace protocol {
+using serial_communication_framework::commands::EmptyRequest;
+using serial_communication_framework::commands::EmptyResponse;
 
-enum class Commands : uint8_t {
-    ping = static_cast<uint8_t>(OperationCodes::ping),
-};
+}  // namespace protocol::commands
 
-}  // namespace protocol
+#include "commands/get_param_metadata_command.h"
+#include "commands/get_registered_param_ids_command.h"
+#include "commands/ping_command.h"
+#include "commands/read_parm_value_command.h"
+#include "commands/write_param_value_command.h"
 
 #endif  // COMMON_PROTOCOL_COMMANDS_H

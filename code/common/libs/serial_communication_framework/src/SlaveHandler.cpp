@@ -6,28 +6,16 @@
 
 namespace serial_communication_framework {
 
-SlaveHandler::SlaveHandler(std::span<OperationCodeHandlerInfo>                        op_code_handler_buffer,
-                           drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface,
+SlaveHandler::SlaveHandler(drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface,
                            drivers::interfaces::ClockInterface& clock_interface, uint8_t device_id)
-    : communication_interface_(communication_interface),
-      device_id_(device_id),
-      timeout_clock_(clock_interface),
-      op_code_handlers_(op_code_handler_buffer) {
+    : communication_interface_(communication_interface), device_id_(device_id), timeout_clock_(clock_interface) {
     ASSERT_WITH_MESSAGE(std::span<uint8_t>(tx_buffer_).size_bytes() >= ResponsePacket::K_PACKET_MAX_SIZE,
                         "Too small tx_buffer");
     ASSERT_WITH_MESSAGE(std::span<uint8_t>(rx_buffer_).size_bytes() >= RequestPacket::K_PACKET_MAX_SIZE,
                         "Too small rx_buffer");
 }
 
-void SlaveHandler::init() { /* TODO SET THE SERIAL COMMUNICATION SETTINGS */
-}
-
-void SlaveHandler::registerHandler(uint8_t op_code, OperationCodeHandler handler) {
-    ASSERT_WITH_MESSAGE(op_code_handlers_.size() > op_code_handler_registering_index_,
-                        "Op code handler registering index out of bounds. Too small buffer");
-    op_code_handlers_[op_code_handler_registering_index_] = {op_code, handler};
-    op_code_handler_registering_index_++;
-}
+void SlaveHandler::init() { /* TODO SET THE SERIAL COMMUNICATION SETTINGS */ }
 
 void SlaveHandler::run() {
     static size_t rx_index             = 0;
@@ -106,16 +94,17 @@ void SlaveHandler::run() {
         }
         communication_statistics_.valid_packets_received++;
 
-        OperationCodeHandler op_code_handler = getOpcodeHandler(packet.header.operation_code);
+        AdapterFunc adapter_func = command_handlers_[packet.header.operation_code];
 
-        ResponseData response_data;
-        if (op_code_handler == nullptr) {
-            response_data = {ResponseCode::unknown_operation_code, {}};
+        AdapterFuncResponse adapter_func_response;
+        if (adapter_func == nullptr) {
+            adapter_func_response = {ResponseCode::unknown_operation_code, {}};
         } else {
-            response_data = op_code_handler(packet.payload);
+            adapter_func_response = adapter_func(this, packet.payload);
         }
 
-        ResponsePacket     response(static_cast<uint8_t>(response_data.response_code), response_data.response_data);
+        ResponsePacket     response(static_cast<uint8_t>(adapter_func_response.response_code),
+                                    adapter_func_response.response_data);
         std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
 
         if (responseHasTimedout()) {
@@ -130,16 +119,6 @@ void SlaveHandler::run() {
 }
 
 const CommunicationStatistics& SlaveHandler::getCommunicationStatistics() const { return communication_statistics_; }
-
-OperationCodeHandler SlaveHandler::getOpcodeHandler(uint8_t op_code) {
-    for (OperationCodeHandlerInfo op_code_info : op_code_handlers_) {
-        if (op_code_info.operation_code == op_code) {
-            return op_code_info.handler;
-        }
-    }
-
-    return nullptr;
-}
 
 void SlaveHandler::startResponseTimeout() { response_timout_start_time_point_ = timeout_clock_.uptimeMilliseconds(); }
 
