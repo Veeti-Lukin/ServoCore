@@ -11,8 +11,7 @@ using ParameterID                        = uint8_t;
 using ParameterOnChangeCallback          = void (*)();
 constexpr ParameterID K_MAX_PARAMETER_ID = std::numeric_limits<ParameterID>::max();
 
-// TODO could be named as "class", because then "ValueType" could be just type
-enum class ParameterType : uint8_t {
+enum class ParameterCategory : uint8_t {
     saved_parameter,    ///< Device won't change by itself, value saved between the reboots
     runtime_parameter,  ///< Device won't change by itself, value resets between the reboots
     signal,             ///< Only changed by the device, always read only
@@ -58,13 +57,13 @@ struct ParameterMetaData {
     static constexpr size_t K_PARAMETER_NAME_MAX_LENGTH = 52;
 
     ParameterID        id;
-    ParameterType      type;
+    ParameterCategory  category;
     ParameterValueType value_type;
     ReadWriteAccess    read_write_access;
     char               name[K_PARAMETER_NAME_MAX_LENGTH];
 };
 
-inline const char* mapParameterTypeToString(ParameterValueType param_type) {
+inline const char* mapParameterValueTypeToString(ParameterValueType param_type) {
     switch (param_type) {
         case ParameterValueType::uint8:
             return "uint8";
@@ -107,13 +106,13 @@ inline const char* mapReadWriteAccessToString(ReadWriteAccess read_write_access)
     }
 }
 
-inline const char* mapParameterCategoryToString(ParameterType type) {
-    switch (type) {
-        case ParameterType::saved_parameter:
+inline const char* mapParameterCategoryToString(ParameterCategory category) {
+    switch (category) {
+        case ParameterCategory::saved_parameter:
             return "Saved";
-        case ParameterType::runtime_parameter:
+        case ParameterCategory::runtime_parameter:
             return "Runtime";
-        case ParameterType::signal:
+        case ParameterCategory::signal:
             return "Signal";
         default:
             return "unknown";

@@ -31,7 +31,7 @@ serial_communication_framework::commands::ResponseBase::ParsingError GetParamMet
     std::span<uint8_t> bytes) {
     // plus 1 because the name must have at least null termination
     constexpr size_t K_MINIMUM_BUFFER_SIZE = sizeof(parameter_system::ParameterMetaData::id) +
-                                             sizeof(parameter_system::ParameterMetaData::type) +
+                                             sizeof(parameter_system::ParameterMetaData::category) +
                                              sizeof(parameter_system::ParameterMetaData::value_type) +
                                              sizeof(parameter_system::ParameterMetaData::read_write_access) + 1;
     if (bytes.size_bytes() < K_MINIMUM_BUFFER_SIZE) return ParsingError::payload_missing_bytes;
@@ -40,8 +40,8 @@ serial_communication_framework::commands::ResponseBase::ParsingError GetParamMet
     std::memcpy(&meta_data.id, &bytes[idx], sizeof(meta_data.id));
     idx += sizeof(meta_data.id);
 
-    std::memcpy(&meta_data.type, &bytes[idx], sizeof(meta_data.type));
-    idx += sizeof(meta_data.type);
+    std::memcpy(&meta_data.category, &bytes[idx], sizeof(meta_data.category));
+    idx += sizeof(meta_data.category);
 
     std::memcpy(&meta_data.value_type, &bytes[idx], sizeof(meta_data.value_type));
     idx += sizeof(meta_data.value_type);
@@ -62,7 +62,7 @@ serial_communication_framework::commands::ResponseBase::ParsingError GetParamMet
 
 std::span<uint8_t> GetParamMetadataResponse::serialize(std::span<uint8_t> target_buffer) {
     constexpr size_t K_REQUIRED_BUFFER_SIZE = sizeof(parameter_system::ParameterMetaData::id) +
-                                              sizeof(parameter_system::ParameterMetaData::type) +
+                                              sizeof(parameter_system::ParameterMetaData::category) +
                                               sizeof(parameter_system::ParameterMetaData::value_type) +
                                               sizeof(parameter_system::ParameterMetaData::read_write_access) +
                                               parameter_system::ParameterMetaData::K_PARAMETER_NAME_MAX_LENGTH;
@@ -72,8 +72,8 @@ std::span<uint8_t> GetParamMetadataResponse::serialize(std::span<uint8_t> target
     std::memcpy(&target_buffer[idx], &meta_data.id, sizeof(meta_data.id));
     idx += sizeof(meta_data.id);
 
-    std::memcpy(&target_buffer[idx], &meta_data.type, sizeof(meta_data.type));
-    idx += sizeof(meta_data.type);
+    std::memcpy(&target_buffer[idx], &meta_data.category, sizeof(meta_data.category));
+    idx += sizeof(meta_data.category);
 
     std::memcpy(&target_buffer[idx], &meta_data.value_type, sizeof(meta_data.value_type));
     idx += sizeof(meta_data.value_type);

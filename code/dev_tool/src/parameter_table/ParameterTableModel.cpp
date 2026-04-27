@@ -31,11 +31,11 @@ QVariant ParameterTableModel::data(const QModelIndex& index, int role) const {
             case static_cast<int>(Columns::name):
                 return row.meta_data.name;
             case static_cast<int>(Columns::category):
-                return parameter_system::mapParameterCategoryToString(row.meta_data.type);
+                return parameter_system::mapParameterCategoryToString(row.meta_data.category);
             case static_cast<int>(Columns::access):
                 return parameter_system::mapReadWriteAccessToString(row.meta_data.read_write_access);
             case static_cast<int>(Columns::value_type):
-                return parameter_system::mapParameterTypeToString(row.meta_data.value_type);
+                return parameter_system::mapParameterValueTypeToString(row.meta_data.value_type);
             case static_cast<int>(Columns::value):
                 return row.value;
         }
@@ -121,7 +121,7 @@ void ParameterTableModel::sort(int column_index, Qt::SortOrder order) {
             break;
         case Columns::category:
             std::sort(rows_.begin(), rows_.end(), [compare](const RowData& left, const RowData& right) {
-                return compare(left.meta_data.type, right.meta_data.type);
+                return compare(left.meta_data.category, right.meta_data.category);
             });
             break;
         case Columns::value_type:

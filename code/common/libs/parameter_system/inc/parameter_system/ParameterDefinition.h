@@ -23,18 +23,36 @@ public:
      * @param declaration   The corresponding parameter declaration.
      * @param read_write_access Read/write access mode.
      * @param name          Null-terminated parameter name.
-     * @param type          Logical parameter type.
+     * @param category      Logical parameter category (Saved/Runtime/Signal).
      * @param data_ref      Reference to the parameter’s underlying variable.
      * @param on_change_cb  Optional callback invoked when the value changes.
      */
     template <ParameterValueType T_ValueType>
     ParameterDefinition(const ParameterDeclaration<T_ValueType>& declaration, ReadWriteAccess read_write_access,
-                        const char name[], ParameterType type,
+                        const char name[], ParameterCategory category,
                         typename MapParameterValueTypeToCppType<T_ValueType>::type& data_ref,
                         ParameterOnChangeCallback                                   on_change_cb) {
+        // Category drives the access design:
+        //   Signal               — only the device sets, master can only read.
+        //   Saved / Runtime      — master writes, device reads. Always read_write.
+        // The helper constructors (SignalParameter / SavedParameter / RuntimeParameter)
+        // pin the right access automatically; this guard catches anyone constructing
+        // ParameterDefinition directly with a mismatched pair.
+        switch (category) {
+            case ParameterCategory::signal:
+                ASSERT_WITH_MESSAGE(read_write_access == ReadWriteAccess::read_only,
+                                    "Signal parameters must be read_only");
+                break;
+            case ParameterCategory::saved_parameter:
+            case ParameterCategory::runtime_parameter:
+                ASSERT_WITH_MESSAGE(read_write_access == ReadWriteAccess::read_write,
+                                    "Saved/Runtime parameters must be read_write");
+                break;
+        }
+
         meta_data_.id                = declaration.id;
         meta_data_.read_write_access = read_write_access;
-        meta_data_.type              = type;
+        meta_data_.category          = category;
         meta_data_.value_type        = declaration.param_value_type;
         // copy the name to the metadata
         for (size_t i = 0; i < ParameterMetaData::K_PARAMETER_NAME_MAX_LENGTH; i++) {
