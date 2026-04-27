@@ -29,7 +29,7 @@ namespace assert::internal {
 
     if (getAssertionFailedReaction() == OnAssertFailReaction::call_assertion_handler ||
         getAssertionFailedReaction() == OnAssertFailReaction::call_assertion_handler_and_break_point) {
-        if (getAssertionFailedHandler() != nullptr) getAssertionFailedHandler();
+        if (getAssertionFailedHandler() != nullptr) getAssertionFailedHandler()();
     }
 
     if (getAssertionFailedReaction() == OnAssertFailReaction::break_point ||
@@ -41,7 +41,7 @@ namespace assert::internal {
 [[noreturn]] void onAssertFail() {
     if (getAssertionFailedReaction() == OnAssertFailReaction::call_assertion_handler ||
         getAssertionFailedReaction() == OnAssertFailReaction::call_assertion_handler_and_break_point) {
-        if (getAssertionFailedHandler() != nullptr) getAssertionFailedHandler();
+        if (getAssertionFailedHandler() != nullptr) getAssertionFailedHandler()();
     }
 
     // Given assertion handler might have sent some debug messages so
