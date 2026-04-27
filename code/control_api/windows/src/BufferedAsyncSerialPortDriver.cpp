@@ -17,8 +17,8 @@ BufferedAsyncSerialPortDriver::BufferedAsyncSerialPortDriver(const char* serial_
     only open an existing file, and since serial ports already exist, this is what we want. After this comes
     FILE ATTRIBUTE NORMAL, which just tells Windows we don’t want anything fancy here. The final argument
     should also be zero.*/
-    serial_port_handle_ =
-        CreateFile(serial_port_name, GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    serial_port_handle_ = CreateFile(makeValidComPortPath(serial_port_name).c_str(), GENERIC_READ | GENERIC_WRITE, 0,
+                                     nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
     if (serial_port_handle_ == INVALID_HANDLE_VALUE) {
         if (GetLastError() == ERROR_FILE_NOT_FOUND) {
@@ -152,6 +152,13 @@ std::string BufferedAsyncSerialPortDriver::getLastErrorStr() {
                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), string_buff, K_ERROR_STRING_BUFF_SIZE, nullptr);
 
     return string_buff;
+}
+
+std::string BufferedAsyncSerialPortDriver::makeValidComPortPath(std::string_view str) {
+    if (!str.starts_with(R"(\\.\)")) {
+        return std::format(R"(\\.\{})", str);
+    }
+    return std::string(str);
 }
 
 }  // namespace servo_core_control_api::windows::internal
