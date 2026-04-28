@@ -35,8 +35,7 @@ public:
             if (parse_result != commands::ParsingError::no_error) {
                 DEBUG_PRINT("[SlaveHandler] deserialize failed: op_code=%h payload_size=% parse_error=%\n",
                             T_Command::K_OP_CODE, request_data.size_bytes(), static_cast<uint8_t>(parse_result));
-                // TODO handle all error cases
-                ASSERT_WITH_MESSAGE(false, "UNIMPLEMENTED CODE");
+                return {ResponseCode::malformed_request, {}};
             }
 
             typename T_Command::Response response = T_HandlerFunc(command_req);

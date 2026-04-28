@@ -14,9 +14,11 @@ enum class ResponseCode : uint8_t {
     timed_out              = 0x01,
     corrupted              = 0x02,  // crc matching failed
     unknown_operation_code = 0x03,
+    malformed_response     = 0x04,  // master could not deserialize slave's response payload
+    malformed_request      = 0x05,  // slave could not deserialize master's request payload
 
     FIRST_INTERNAL         = timed_out,
-    LAST_INTERNAL          = unknown_operation_code,
+    LAST_INTERNAL          = malformed_request,
     // ####################################################################
 
     // Something weird happened on the slave side, not directly in any way responsible to what master requested

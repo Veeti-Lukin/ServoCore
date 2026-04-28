@@ -5,6 +5,7 @@
 #include <span>
 
 #include "command_interface.h"
+#include "debug_print/debug_print.h"
 #include "drivers/interfaces/BufferedSerialCommunicationInterface.h"
 #include "drivers/interfaces/ClockInterface.h"
 #include "serial_communication_framework/common.h"
@@ -78,10 +79,14 @@ public:
         // TODO Resetting tx buffer and rx buffer
 
         typename T_Command::Response command_response;
-        command_response.response_code = static_cast<ResponseCode>(response.header.response_code);
-        if (command_response.deserialize(response.payload) != commands::ParsingError::no_error) {
-            // TODO HANDLE ERRORS
+        const commands::ParsingError parse_result = command_response.deserialize(response.payload);
+        if (parse_result != commands::ParsingError::no_error) {
+            DEBUG_PRINT("[MasterHandler] deserialize failed: op_code=%h payload_size=% parse_error=%\n",
+                        T_Command::K_OP_CODE, response.payload.size_bytes(), static_cast<uint8_t>(parse_result));
+            command_response.response_code = ResponseCode::malformed_response;
+            return command_response;
         }
+        command_response.response_code = static_cast<ResponseCode>(response.header.response_code);
 
         return command_response;
     }
