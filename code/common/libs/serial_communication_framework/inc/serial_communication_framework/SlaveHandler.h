@@ -23,8 +23,8 @@ public:
 
     void init();
 
-    // TODO tälle concepti tai static assert että on oikeesti commandi
-    template <typename T_Command, typename T_Command::Response (*T_HandlerFunc)(const typename T_Command::Request&)>
+    template <commands::CommandType T_Command,
+              typename T_Command::Response (*T_HandlerFunc)(const typename T_Command::Request&)>
     void registerCommandHandler() {
         ASSERT_WITH_MESSAGE(command_handlers_[T_Command::K_OP_CODE] == nullptr, "Op code already registered");
 

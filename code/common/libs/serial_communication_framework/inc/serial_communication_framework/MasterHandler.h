@@ -22,8 +22,7 @@ public:
 
     void init();
 
-    // TODO tälle concepti tai static assert että on oikeesti commandi
-    template <typename T_Command>
+    template <commands::CommandType T_Command>
     [[nodiscard]] typename T_Command::Response sendCommandAndReceiveResponseBlocking(
         uint8_t receiver_id, typename T_Command::Request command_request) {
         RequestPacket request(receiver_id, T_Command::K_OP_CODE, command_request.serialize(command_staging_buffer));
