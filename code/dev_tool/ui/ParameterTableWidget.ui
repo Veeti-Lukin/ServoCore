@@ -46,9 +46,19 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QPushButton" name="forceRefreshAllPushButton">
+       <property name="toolTip">
+        <string>Re-reads every parameter, including Saved and Runtime ones that should not be changed by the firmware. Use as a sanity check, e.g. after reconnect or if another tool may have written.</string>
+       </property>
+       <property name="text">
+        <string>Force Refresh All</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="refreshPushButton">
        <property name="text">
-        <string>Refresh Values</string>
+        <string>Refresh Signal Values</string>
        </property>
       </widget>
      </item>

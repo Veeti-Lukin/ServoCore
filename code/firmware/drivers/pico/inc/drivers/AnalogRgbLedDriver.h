@@ -86,6 +86,8 @@ private:
     AnalogRgbLedType led_type_;
 
     float brightness_multiplier_ = 1.0f;
+
+    RGB current_color_           = RGB(0, 0, 0);
 };
 
 }  // namespace drivers

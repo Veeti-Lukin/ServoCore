@@ -1,7 +1,11 @@
 #include "parameter_table/ParameterTableModel.h"
 
+#include <QApplication>
+#include <QBrush>
+#include <QPalette>
+
 #include "helpers.h"
-#include "parameter_system/definitions.h"
+#include "parameter_system/common.h"
 
 namespace parameter_table {
 
@@ -30,17 +34,22 @@ QVariant ParameterTableModel::data(const QModelIndex& index, int role) const {
                 return helpers::intToHexString(row.meta_data.id);
             case static_cast<int>(Columns::name):
                 return row.meta_data.name;
+            case static_cast<int>(Columns::category):
+                return parameter_system::mapParameterCategoryToString(row.meta_data.category);
             case static_cast<int>(Columns::access):
                 return parameter_system::mapReadWriteAccessToString(row.meta_data.read_write_access);
-            case static_cast<int>(Columns::type):
-                return parameter_system::mapParameterTypeToString(row.meta_data.type);
+            case static_cast<int>(Columns::value_type):
+                return parameter_system::mapParameterValueTypeToString(row.meta_data.value_type);
             case static_cast<int>(Columns::value):
-                // Check if parameter is write-only, if so return empty QVariant
-                if (row.meta_data.read_write_access == parameter_system::ReadWriteAccess::write_only) {
-                    return {};  // Hide value
-                }
                 return row.value;
         }
+    }
+
+    // Grey out the value cell on read-only rows so signal parameters read as "inactive".
+    // Cell stays selectable (see flags()) so values can still be copied.
+    if (role == Qt::ForegroundRole && index.column() == static_cast<int>(Columns::value) &&
+        row.meta_data.read_write_access == parameter_system::ReadWriteAccess::read_only) {
+        return QBrush(QApplication::palette().color(QPalette::Disabled, QPalette::Text));
     }
 
     return {};
@@ -58,9 +67,11 @@ QVariant ParameterTableModel::headerData(int section, Qt::Orientation orientatio
             return "ID";
         case static_cast<int>(Columns::name):
             return "Name";
+        case static_cast<int>(Columns::category):
+            return "Category";
         case static_cast<int>(Columns::access):
             return "Access";
-        case static_cast<int>(Columns::type):
+        case static_cast<int>(Columns::value_type):
             return "Type";
         case static_cast<int>(Columns::value):
             return "Value";
@@ -75,11 +86,9 @@ Qt::ItemFlags ParameterTableModel::flags(const QModelIndex& index) const {
     // flags for the value column
     if (index.column() == static_cast<size_t>(Columns::value)) {
         RowData row                = rows_[index.row()];
-        bool parameter_is_editable = row.meta_data.read_write_access == parameter_system::ReadWriteAccess::read_write ||
-                                     row.meta_data.read_write_access == parameter_system::ReadWriteAccess::write_only;
+        bool parameter_is_editable = row.meta_data.read_write_access == parameter_system::ReadWriteAccess::read_write;
 
         if (parameter_is_editable) return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        // if not editable default to these flags
         return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     }
 
@@ -95,6 +104,13 @@ bool ParameterTableModel::setData(const QModelIndex& index, const QVariant& valu
         return true;
     }
     return false;
+}
+
+void ParameterTableModel::updateValueFromDevice(int row_index, const QVariant& value) {
+    if (row_index < 0 || row_index >= rows_.size()) return;
+    rows_[row_index].value      = value;
+    const QModelIndex cell_index = index(row_index, static_cast<int>(Columns::value));
+    Q_EMIT dataChanged(cell_index, cell_index);
 }
 void ParameterTableModel::sort(int column_index, Qt::SortOrder order) {
     Columns column = static_cast<Columns>(column_index);
@@ -119,9 +135,14 @@ void ParameterTableModel::sort(int column_index, Qt::SortOrder order) {
                 return compare(left.meta_data.read_write_access, right.meta_data.read_write_access);
             });
             break;
-        case Columns::type:
+        case Columns::category:
             std::sort(rows_.begin(), rows_.end(), [compare](const RowData& left, const RowData& right) {
-                return compare(left.meta_data.type, right.meta_data.type);
+                return compare(left.meta_data.category, right.meta_data.category);
+            });
+            break;
+        case Columns::value_type:
+            std::sort(rows_.begin(), rows_.end(), [compare](const RowData& left, const RowData& right) {
+                return compare(left.meta_data.value_type, right.meta_data.value_type);
             });
             break;
         case Columns::value:

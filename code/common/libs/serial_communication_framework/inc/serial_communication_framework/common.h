@@ -7,18 +7,29 @@
 namespace serial_communication_framework {
 
 enum class ResponseCode : uint8_t {
-    ok,
+    ok                     = 0x00,
 
-    unknown_operation_code,
-    invalid_arguments,
-    payload_missing_parts,
-    timed_out,
-    corrupted,  // crc matching failed
-};
+    // ############# COMMAND HANDLERS SHOULD NOT RETURN THESE #############
+    // ## THESE ARE MEANT TO BE RETURNED AUTOMATICALLY IF AN ERROR OCCURS #
+    timed_out              = 0x01,
+    corrupted              = 0x02,  // crc matching failed
+    unknown_operation_code = 0x03,
+    malformed_response     = 0x04,  // master could not deserialize slave's response payload
+    malformed_request      = 0x05,  // slave could not deserialize master's request payload
 
-struct ResponseData {
-    ResponseCode                                                   response_code;
-    utils::StaticList<uint8_t, ResponsePacket::K_PAYLOAD_MAX_SIZE> response_data;
+    FIRST_INTERNAL         = timed_out,
+    LAST_INTERNAL          = malformed_request,
+    // ####################################################################
+
+    // Something weird happened on the slave side, not directly in any way responsible to what master requested
+    unexpected_local_error = LAST_INTERNAL + 1,
+
+    invalid_id             = LAST_INTERNAL + 2,
+    out_of_bounds          = LAST_INTERNAL + 3,
+    type_mismatch          = LAST_INTERNAL + 4,
+    forbidden              = LAST_INTERNAL + 5,
+
+    unset_default_value    = 0xFF,
 };
 
 struct CommunicationStatistics {

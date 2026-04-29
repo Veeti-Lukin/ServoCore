@@ -11,6 +11,10 @@ add_library(serial_communication_framework STATIC
 
         inc/serial_communication_framework/MasterHandler.h
         src/MasterHandler.cpp
+
+
+        src/command_interface.cpp
+        inc/serial_communication_framework/command_interface.h
 )
 
 set_target_properties(serial_communication_framework PROPERTIES LINKER_LANGUAGE CXX)
@@ -18,7 +22,7 @@ set_target_properties(serial_communication_framework PROPERTIES LINKER_LANGUAGE 
 target_include_directories(serial_communication_framework PUBLIC inc)
 
 target_link_libraries(serial_communication_framework PRIVATE drivers_interfaces assert utils)
-target_link_libraries(serial_communication_framework PUBLIC math)
+target_link_libraries(serial_communication_framework PUBLIC math debug_print)
 
 
 option(SERVO_CORE_DISABLE_SERIAL_COMMUNICATION_FRAMEWORK_TIMEOUTS "Disable serial communication framework timeouts for debugging" off)

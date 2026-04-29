@@ -1,9 +1,20 @@
 #ifndef PROTOCOL_DEFINITION_H
 #define PROTOCOL_DEFINITION_H
 
+#include <bit>
 #include <cstdint>
 #include <limits>
 #include <span>
+
+// The wire format places multi-byte fields in little-endian order and serdes uses memcpy directly
+// against the host representation — no byte swapping. If master and slave disagree on endianness
+// (e.g. host is big-endian but the firmware target is little-endian), every multi-byte field on the
+// wire would be silently misinterpreted. Both currently supported targets (RP2040, x86 Windows/Linux)
+// are little-endian, so we lock that in here rather than pay the cost of byte-swap logic on every field.
+// TODO After adding this, check what where we can refactor code to use memcpy directly now
+static_assert(std::endian::native == std::endian::little,
+              "serial_communication_framework format assumes little-endian host. "
+              "Big-endian support is not implemented.");
 
 namespace serial_communication_framework {
 
@@ -33,12 +44,12 @@ struct RequestPacket {
 
     RequestPacket()                                        = default;
     RequestPacket(uint8_t receiver_id, uint8_t operation_code, std::span<uint8_t> payload)
-        : header{.receiver_id    = receiver_id,
-                 .operation_code = operation_code,
-                 .payload_size   = static_cast<uint8_t>(payload.size_bytes()),
-                 .header_crc =
-                     0},   // will be assigned when packet is serialized, since the data might change before that
-          payload_crc(0),  // will be assigned when packet is serialized, since the data might change before that
+        : header{
+              .receiver_id    = receiver_id,
+              .operation_code = operation_code,
+              .payload_size   = static_cast<uint8_t>(payload.size_bytes()),
+              .header_crc = 0},  // will be assigned when packet is serialized, since the data might change before that
+          payload_crc(0),        // will be assigned when packet is serialized, since the data might change before that
           payload(payload) {}
 };
 
@@ -66,11 +77,11 @@ struct ResponsePacket {
 
     ResponsePacket()                                       = default;
     ResponsePacket(uint8_t response_code, std::span<uint8_t> payload)
-        : header{.response_code = response_code,
-                 .payload_size  = static_cast<uint8_t>(payload.size_bytes()),
-                 .header_crc =
-                     0},   // will be assigned when packet is serialized, since the data might change before that
-          payload_crc(0),  // will be assigned when packet is serialized, since the data might change before that
+        : header{
+              .response_code = response_code,
+              .payload_size  = static_cast<uint8_t>(payload.size_bytes()),
+              .header_crc = 0},  // will be assigned when packet is serialized, since the data might change before that
+          payload_crc(0),        // will be assigned when packet is serialized, since the data might change before that
           payload(payload) {}
 };
 

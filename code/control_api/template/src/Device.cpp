@@ -2,46 +2,44 @@
 
 #include <cstring>
 
-#include "parameter_system/definitions.h"
-#include "protocol/requests.h"
+#include "parameter_system/common.h"
 
 namespace servo_core_control_api {
 Device::~Device() {}
 
-void Device::executeCommand() {}
-
 uint8_t Device::getId() { return device_id_; }
 
-utils::StaticList<ParameterID, parameter_system::K_MAX_PARAMETER_ID> Device::getRegisteredParameterIds() {
+utils::StaticList<ParameterID, parameter_system::K_MAX_PARAMETER_ID> Device::fetchRegisteredParamIds() {
     using serial_communication_framework::ResponseCode;
-    using serial_communication_framework::ResponseData;
 
-    ResponseData response = communication_handler_->sendRequestAndReceiveResponseBlocking(
-        device_id_, protocol::requests::GetRegisteredParameterIds::op_code,
-        protocol::requests::GetRegisteredParameterIds::RequestPayload().serialize());
+    protocol::commands::GetRegisteredParamIds::Response response =
+        communication_handler_->sendCommandAndReceiveResponseBlocking<protocol::commands::GetRegisteredParamIds>(
+            device_id_, {});
 
     if (response.response_code != ResponseCode::ok) {
+        // TODO throw
         return {};
     }
 
-    return protocol::requests::GetRegisteredParameterIds::ResponsePayload(response.response_data)
-        .registered_parameter_ids;
+    return response.ids;
 }
 
-ParameterMetaData Device::getParameterMetaData(ParameterID id) {
+ParameterMetaData Device::fetchParameterMetaData(ParameterID id) {
     using serial_communication_framework::ResponseCode;
-    using serial_communication_framework::ResponseData;
 
-    ResponseData response = communication_handler_->sendRequestAndReceiveResponseBlocking(
-        device_id_, protocol::requests::GetParameterMetaData::op_code,
-        protocol::requests::GetParameterMetaData::RequestPayload(id).serialize());
+    protocol::commands::GetParamMetadataRequest request;
+    request.parameter_id = id;
+
+    protocol::commands::GetParamMetadata::Response response =
+        communication_handler_->sendCommandAndReceiveResponseBlocking<protocol::commands::GetParamMetadata>(device_id_,
+                                                                                                            request);
 
     if (response.response_code != ResponseCode::ok) {
-        switch (response.response_code) {}
+        // TODO throw
         return {};
     }
 
-    return protocol::requests::GetParameterMetaData::ResponsePayload(response.response_data).meta_data;
+    return response.meta_data;
 }
 
 Device::Device(uint8_t id, serial_communication_framework::MasterHandler& communication_handler)

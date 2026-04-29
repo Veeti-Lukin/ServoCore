@@ -47,14 +47,14 @@ if (NOT PICO_SDK_PATH)
 
         if (NOT pico_sdk)
             message("Downloading Raspberry Pi Pico SDK")
-            FetchContent_Populate(pico_sdk)
+            FetchContent_MakeAvailable(pico_sdk)
             set(PICO_SDK_PATH ${pico_sdk_SOURCE_DIR})
         endif ()
         set(FETCHCONTENT_BASE_DIR ${FETCHCONTENT_BASE_DIR_SAVE})
     else ()
         message(FATAL_ERROR
                 "SDK location was not specified. Please set PICO_SDK_PATH or set PICO_SDK_FETCH_FROM_GIT to on to fetch from git."
-                )
+        )
     endif ()
 endif ()
 

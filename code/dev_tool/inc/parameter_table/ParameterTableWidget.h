@@ -61,7 +61,10 @@ private:
     QVector<RowData>        rows_;                      ///< Storage for table parameter rows.
 
     [[nodiscard]] QVector<RowData> fetchParameters() const;
-    void                           refreshParameterValues();
+    void                           refreshSignalParameterValues();
+    void                           refreshAllParameterValues();
+    QVariant getParameterValue(parameter_system::ParameterID id, parameter_system::ParameterValueType type) const;
+    void     writeParameterValue(parameter_system::ParameterID id, const QVariant& value);
 };
 
 }  // namespace parameter_table

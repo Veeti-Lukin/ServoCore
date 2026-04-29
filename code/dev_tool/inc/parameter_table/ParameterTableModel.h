@@ -5,7 +5,7 @@
 #include <QVector>
 
 #include "common.h"
-#include "parameter_system/definitions.h"
+#include "parameter_system/common.h"
 
 namespace parameter_table {
 
@@ -103,6 +103,17 @@ public:
      * @return True if the update was successful, false otherwise.
      */
     [[nodiscard]] bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+
+    /**
+     * @brief Programmatic value update from a device read — does NOT emit parameterValueChanged.
+     *
+     * Used by refresh paths that just want to push the latest device value into the cell
+     * without triggering a write-back round-trip.
+     *
+     * @param row_index Row whose value cell should be updated.
+     * @param value     New display value.
+     */
+    void updateValueFromDevice(int row_index, const QVariant& value);
 
     /**
      * @brief Sorts the table based on the specified column and order.
