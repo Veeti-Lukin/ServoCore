@@ -16,6 +16,7 @@ using serial_communication_framework::commands::EmptyResponse;
 #include "commands/get_registered_param_ids_command.h"
 #include "commands/ping_command.h"
 #include "commands/read_parm_value_command.h"
+#include "commands/reboot_command.h"
 #include "commands/write_param_value_command.h"
 
 #endif  // COMMON_PROTOCOL_COMMANDS_H

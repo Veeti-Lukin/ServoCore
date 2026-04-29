@@ -20,6 +20,9 @@ public:
 
     void setDeviceNickname(const QString& nickname);
 
+private slots:
+    void onRebootClicked();
+
 private:
     Ui::DeviceControlWidget* ui;
 

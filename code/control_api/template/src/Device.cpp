@@ -9,6 +9,12 @@ Device::~Device() {}
 
 uint8_t Device::getId() { return device_id_; }
 
+serial_communication_framework::ResponseCode Device::reboot() {
+    protocol::commands::Reboot::Response response =
+        communication_handler_->sendCommandAndReceiveResponseBlocking<protocol::commands::Reboot>(device_id_, {});
+    return response.response_code;
+}
+
 utils::StaticList<ParameterID, parameter_system::K_MAX_PARAMETER_ID> Device::fetchRegisteredParamIds() {
     using serial_communication_framework::ResponseCode;
 

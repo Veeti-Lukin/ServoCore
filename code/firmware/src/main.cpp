@@ -3,6 +3,7 @@
 #include <hardware/pwm.h>
 #include <hardware/structs/uart.h>
 #include <hardware/uart.h>
+#include <hardware/watchdog.h>
 
 #include <cmath>
 
@@ -122,6 +123,7 @@ void initSWLibs() {
     assert::connectAssertionFailedHandler(onAssertionFailed);
 
     protocol_handler.registerCommandHandler<protocol::commands::Ping, protocol_handlers::ping>();
+    protocol_handler.registerCommandHandler<protocol::commands::Reboot, protocol_handlers::reboot>();
     protocol_handler
         .registerCommandHandler<protocol::commands::GetRegisteredParamIds, protocol_handlers::getParamIds>();
     protocol_handler
@@ -167,6 +169,14 @@ void initSWLibs() {
     /// ************************* MAIN LOOP ************************* ///
     while (true) {
         protocol_handler.run();
+
+        if (protocol_handlers::isRebootPending()) {
+            // Block until the ACK packet has fully left the UART before resetting.
+            communication_uart_driver.flushTx();
+            watchdog_reboot(0, 0, 0);
+            while (true) {}
+        }
+
         test_uint32++;
 
         /* // Old debugging code that can be removed later

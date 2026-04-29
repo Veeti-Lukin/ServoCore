@@ -38,6 +38,8 @@ public:
 
     uint8_t getId();
 
+    serial_communication_framework::ResponseCode reboot();
+
     utils::StaticList<ParameterID, parameter_system::K_MAX_PARAMETER_ID> fetchRegisteredParamIds();
 
     ParameterMetaData fetchParameterMetaData(ParameterID id);

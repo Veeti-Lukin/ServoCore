@@ -13,6 +13,9 @@ protocol::commands::GetParamMetadataResponse getParamMetaData(
 
 protocol::commands::GetRegisteredParamIdsResponse getParamIds(const protocol::commands::EmptyRequest& request);
 protocol::commands::EmptyResponse                 ping(const protocol::commands::EmptyRequest& request);
+protocol::commands::EmptyResponse                 reboot(const protocol::commands::EmptyRequest& request);
+
+bool isRebootPending();
 
 }  // namespace protocol_handlers
 

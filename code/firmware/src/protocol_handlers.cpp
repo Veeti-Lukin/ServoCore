@@ -9,6 +9,10 @@ extern parameter_system::ParameterDatabase parameter_database;
 
 namespace protocol_handlers {
 
+namespace {
+bool reboot_pending = false;
+}
+
 protocol::commands::ReadParamValueResponse readParamValue(const protocol::commands::ReadParamValueRequest& request) {
     protocol::commands::ReadParamValueResponse response;
 
@@ -113,5 +117,17 @@ protocol::commands::EmptyResponse ping(const protocol::commands::EmptyRequest& r
     response.response_code = serial_communication_framework::ResponseCode::ok;
     return response;
 }
+
+protocol::commands::EmptyResponse reboot(const protocol::commands::EmptyRequest& request) {
+    (void)request;  // unused
+
+    reboot_pending = true;
+
+    protocol::commands::EmptyResponse response;
+    response.response_code = serial_communication_framework::ResponseCode::ok;
+    return response;
+}
+
+bool isRebootPending() { return reboot_pending; }
 
 }  // namespace protocol_handlers
