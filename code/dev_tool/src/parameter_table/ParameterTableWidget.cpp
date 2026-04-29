@@ -105,9 +105,8 @@ void ParameterTableWidget::refreshSignalParameterValues() {
         RowData& row = rows_[i];
         if (row.meta_data.category != parameter_system::ParameterCategory::signal) continue;
 
-        QVariant    new_value        = getParameterValue(row.meta_data.id, row.meta_data.value_type);
-        QModelIndex table_cell_index = table_model_->index(i, static_cast<int>(Columns::value));
-        Q_UNUSED(table_model_->setData(table_cell_index, new_value, Qt::EditRole));
+        QVariant new_value = getParameterValue(row.meta_data.id, row.meta_data.value_type);
+        table_model_->updateValueFromDevice(static_cast<int>(i), new_value);
     }
 }
 
@@ -115,10 +114,9 @@ void ParameterTableWidget::refreshAllParameterValues() {
     // Re-reads every parameter regardless of category. Used as a manual sanity check (e.g., another
     // tool may have written, after reconnect, debugging) — not used by the auto-refresh timer.
     for (size_t i = 0; i < rows_.size(); i++) {
-        RowData&    row              = rows_[i];
-        QVariant    new_value        = getParameterValue(row.meta_data.id, row.meta_data.value_type);
-        QModelIndex table_cell_index = table_model_->index(i, static_cast<int>(Columns::value));
-        Q_UNUSED(table_model_->setData(table_cell_index, new_value, Qt::EditRole));
+        RowData& row       = rows_[i];
+        QVariant new_value = getParameterValue(row.meta_data.id, row.meta_data.value_type);
+        table_model_->updateValueFromDevice(static_cast<int>(i), new_value);
     }
 }
 

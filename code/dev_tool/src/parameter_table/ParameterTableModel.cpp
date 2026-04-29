@@ -105,6 +105,13 @@ bool ParameterTableModel::setData(const QModelIndex& index, const QVariant& valu
     }
     return false;
 }
+
+void ParameterTableModel::updateValueFromDevice(int row_index, const QVariant& value) {
+    if (row_index < 0 || row_index >= rows_.size()) return;
+    rows_[row_index].value      = value;
+    const QModelIndex cell_index = index(row_index, static_cast<int>(Columns::value));
+    Q_EMIT dataChanged(cell_index, cell_index);
+}
 void ParameterTableModel::sort(int column_index, Qt::SortOrder order) {
     Columns column = static_cast<Columns>(column_index);
 
