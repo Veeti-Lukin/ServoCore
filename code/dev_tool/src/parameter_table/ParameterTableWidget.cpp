@@ -129,8 +129,10 @@ QVariant ParameterTableWidget::getParameterValue(parameter_system::ParameterID  
 
     switch (type) {
         case ParameterValueType::uint8:
-            return QVariant::fromValue(
-                device_->readParameterValue(ParameterDeclaration<ParameterValueType::uint8>{id}));
+            // Widen to quint16 — QVariant treats uint8_t (== unsigned char) as a character
+            // and would display the codepoint instead of the number.
+            return QVariant::fromValue(static_cast<quint16>(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::uint8>{id})));
         case ParameterValueType::uint16:
             return QVariant::fromValue(
                 device_->readParameterValue(ParameterDeclaration<ParameterValueType::uint16>{id}));
@@ -141,7 +143,9 @@ QVariant ParameterTableWidget::getParameterValue(parameter_system::ParameterID  
             return QVariant::fromValue(
                 device_->readParameterValue(ParameterDeclaration<ParameterValueType::uint64>{id}));
         case ParameterValueType::int8:
-            return QVariant::fromValue(device_->readParameterValue(ParameterDeclaration<ParameterValueType::int8>{id}));
+            // Widen to qint16 — QVariant treats int8_t (== signed char) as a character.
+            return QVariant::fromValue(static_cast<qint16>(
+                device_->readParameterValue(ParameterDeclaration<ParameterValueType::int8>{id})));
         case ParameterValueType::int16:
             return QVariant::fromValue(
                 device_->readParameterValue(ParameterDeclaration<ParameterValueType::int16>{id}));
