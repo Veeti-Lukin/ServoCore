@@ -1,5 +1,9 @@
 #include "parameter_table/ParameterTableModel.h"
 
+#include <QApplication>
+#include <QBrush>
+#include <QPalette>
+
 #include "helpers.h"
 #include "parameter_system/common.h"
 
@@ -41,6 +45,13 @@ QVariant ParameterTableModel::data(const QModelIndex& index, int role) const {
         }
     }
 
+    // Grey out the value cell on read-only rows so signal parameters read as "inactive".
+    // Cell stays selectable (see flags()) so values can still be copied.
+    if (role == Qt::ForegroundRole && index.column() == static_cast<int>(Columns::value) &&
+        row.meta_data.read_write_access == parameter_system::ReadWriteAccess::read_only) {
+        return QBrush(QApplication::palette().color(QPalette::Disabled, QPalette::Text));
+    }
+
     return {};
 }
 QVariant ParameterTableModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -78,8 +89,6 @@ Qt::ItemFlags ParameterTableModel::flags(const QModelIndex& index) const {
         bool parameter_is_editable = row.meta_data.read_write_access == parameter_system::ReadWriteAccess::read_write;
 
         if (parameter_is_editable) return Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable;
-        // if not editable default to these flags
-        // TODO somehow "grey out" the signal parameter, but so that they are still selectable for copying value etc.
         return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     }
 
