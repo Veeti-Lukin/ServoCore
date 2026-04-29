@@ -10,13 +10,6 @@
 
 namespace serial_communication_framework::commands {
 
-enum class CommandError : uint8_t {
-    ok,
-
-    forbidden,
-
-};
-
 enum class ParsingError {
     no_error,
 
