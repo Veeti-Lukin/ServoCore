@@ -16,6 +16,7 @@ enum class ParameterIds : parameter_system::ParameterID {
     loob_back   = 0x07,
 
     // ************************ MOTOR PARAMETERS ********************************
+    encoder_angle_degrees = 0x10,
 };
 
 }

@@ -33,6 +33,15 @@ DECLARE_PARAMETER(loop_back, ParameterIds::loob_back, uint8);
 
 }  // namespace test_params
 
+namespace motor_params {
+using parameter_system::ParameterDeclaration;
+using parameter_system::ParameterID;
+using parameter_system::ParameterValueType;
+
+DECLARE_PARAMETER(encoder_angle_degrees, ParameterIds::encoder_angle_degrees, double_float);
+
+}  // namespace motor_params
+
 }  // namespace protocol
 
 #endif  // COMMON_PROTOCOL_PARAMETERS_H

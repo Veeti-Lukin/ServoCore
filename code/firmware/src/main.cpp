@@ -169,6 +169,10 @@ void initSWLibs() {
     parameter_system::SignalParameter  loop_back_parm(protocol::test_params::loop_back, "Loopback of Test Uint8",
                                                       test_uint8);
 
+    double                            encoder_angle_degrees = 0.0;
+    parameter_system::SignalParameter encoder_angle_degrees_param(protocol::motor_params::encoder_angle_degrees,
+                                                                  "Encoder Angle (deg)", encoder_angle_degrees);
+
     parameter_database.registerParameter(&param1);
     parameter_database.registerParameter(&param2);
     parameter_database.registerParameter(&param3);
@@ -176,6 +180,7 @@ void initSWLibs() {
     parameter_database.registerParameter(&param5);
     parameter_database.registerParameter(&param6);
     parameter_database.registerParameter(&loop_back_parm);
+    parameter_database.registerParameter(&encoder_angle_degrees_param);
 
     DEBUG_PRINT("Init done, entering main loop!\n");
 
@@ -183,6 +188,8 @@ void initSWLibs() {
     while (true) {
         protocol_handler.run();
         test_uint32++;
+
+        encoder_angle_degrees = encoder.readAbsoluteAngleDegrees();
 
         /* // Old debugging code that can be removed later
         while (communication_uart_driver.getReceivedBytesAvailableAmount() > 0) {
