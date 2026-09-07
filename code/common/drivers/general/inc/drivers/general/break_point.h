@@ -32,7 +32,7 @@ inline void volatile triggerBreakpoint() {
     __debugbreak()
 
 #elif defined(__APPLE__) && defined(__MACH__)  // macOS/iOS (Clang)
-#include <signal>
+#include <csignal>
     std::raise(SIGTRAP)
 
 #else

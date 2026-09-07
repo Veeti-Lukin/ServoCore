@@ -1,6 +1,8 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <span>
+
 #include "serial_communication_framework/packets.h"
 
 namespace serial_communication_framework {

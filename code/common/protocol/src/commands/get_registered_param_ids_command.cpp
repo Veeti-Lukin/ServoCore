@@ -1,5 +1,7 @@
 #include "protocol/commands/get_registered_param_ids_command.h"
 
+#include <span>
+
 #include "assert/assert.h"
 
 namespace protocol::commands {

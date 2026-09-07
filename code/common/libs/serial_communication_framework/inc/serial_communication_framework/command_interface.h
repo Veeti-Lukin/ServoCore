@@ -2,8 +2,10 @@
 #ifndef COMMON_LIBS_SERIAL_COMMUNICATION_FRAMEWORK_REQUESTPAYLOADBASE_H
 #define COMMON_LIBS_SERIAL_COMMUNICATION_FRAMEWORK_REQUESTPAYLOADBASE_H
 
+#include <concepts>
 #include <cstdint>
 #include <span>
+#include <type_traits>
 
 #include "serial_communication_framework/common.h"
 #include "serial_communication_framework/packets.h"

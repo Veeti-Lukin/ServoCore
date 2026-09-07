@@ -1,8 +1,10 @@
 #ifndef COMMON_LIBS_UTILS_STATICLIST_H
 #define COMMON_LIBS_UTILS_STATICLIST_H
 
+#include <algorithm>
 #include <initializer_list>
 #include <memory>
+#include <span>
 #include <utility>
 
 #include "assert/assert.h"

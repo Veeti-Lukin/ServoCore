@@ -1,5 +1,7 @@
 #include "parameter_system/ParameterDatabase.h"
 
+#include <span>
+
 #include "assert/assert.h"
 
 namespace parameter_system {

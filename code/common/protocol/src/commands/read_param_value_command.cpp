@@ -1,4 +1,5 @@
 #include <cstring>
+#include <span>
 
 #include "assert/assert.h"
 #include "protocol/commands/read_parm_value_command.h"

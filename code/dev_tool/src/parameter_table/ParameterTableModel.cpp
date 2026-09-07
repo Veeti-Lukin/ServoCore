@@ -1,5 +1,7 @@
 #include "parameter_table/ParameterTableModel.h"
 
+#include <algorithm>
+
 #include <QApplication>
 #include <QBrush>
 #include <QPalette>

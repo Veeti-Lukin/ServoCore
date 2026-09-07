@@ -5,6 +5,7 @@
 #include <hardware/uart.h>
 
 #include <cstdint>
+#include <span>
 
 #include "assert/assert.h"
 #include "drivers/interfaces/BufferedSerialCommunicationInterface.h"

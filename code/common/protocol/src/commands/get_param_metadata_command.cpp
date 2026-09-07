@@ -1,6 +1,7 @@
 #include "protocol/commands/get_param_metadata_command.h"
 
 #include <cstring>
+#include <span>
 
 #include "assert/assert.h"
 #include "protocol/parameters.h"

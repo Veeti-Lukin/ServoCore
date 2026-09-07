@@ -5,6 +5,9 @@
 #include "ui_MainWindow.h"
 // ####
 
+#include <algorithm>
+#include <optional>
+
 #include <QBoxLayout>
 #include <QSerialPortInfo>
 #include <QStackedLayout>

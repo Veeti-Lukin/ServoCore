@@ -1,5 +1,7 @@
 #include "math/crc.h"
 
+#include <span>
+
 namespace math {
 
 /**

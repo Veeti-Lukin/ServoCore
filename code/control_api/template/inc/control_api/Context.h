@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <optional>
+#include <span>
 
 #include "control_api/Device.h"
 #include "drivers/interfaces/BufferedSerialCommunicationInterface.h"

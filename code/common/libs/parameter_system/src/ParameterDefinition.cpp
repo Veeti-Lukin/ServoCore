@@ -1,5 +1,8 @@
 #include "parameter_system/ParameterDefinition.h"
 
+#include <cstring>
+#include <span>
+
 namespace parameter_system {
 
 ReadWriteResult ParameterDefinition::setValueRaw(std::span<uint8_t> buff) {

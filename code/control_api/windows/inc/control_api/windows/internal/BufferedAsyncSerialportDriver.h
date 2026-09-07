@@ -4,7 +4,9 @@
 #include <windows.h>
 
 #include <format>
+#include <span>
 #include <string>
+#include <string_view>
 
 #include "drivers/interfaces/BufferedSerialCommunicationInterface.h"
 #include "utils/RingBuffer.h"

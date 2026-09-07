@@ -1,7 +1,9 @@
 #ifndef CONTROL_API_DEVICE_H
 #define CONTROL_API_DEVICE_H
 
+#include <concepts>
 #include <cstdint>
+#include <limits>
 
 #include "parameter_system/ParameterDeclaration.h"
 #include "parameter_system/common.h"

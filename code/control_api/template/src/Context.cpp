@@ -1,5 +1,7 @@
 #include "control_api/Context.h"
 
+#include <optional>
+
 #include "protocol/commands.h"
 
 namespace servo_core_control_api {

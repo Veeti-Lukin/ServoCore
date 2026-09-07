@@ -2,6 +2,7 @@
 
 #include <climits>
 #include <format>
+#include <limits>
 #include <string>
 
 #include "debug_print/debug_print.h"

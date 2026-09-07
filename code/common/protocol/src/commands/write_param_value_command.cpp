@@ -1,6 +1,7 @@
 #include "protocol/commands/write_param_value_command.h"
 
 #include <cstring>
+#include <span>
 
 #include "assert/assert.h"
 

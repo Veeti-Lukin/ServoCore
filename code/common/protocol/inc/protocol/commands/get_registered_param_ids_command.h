@@ -1,6 +1,8 @@
 #ifndef COMMON_PROTOCOL_GET_REGISTERED_PARAMETER_IDS_COMMAND_H
 #define COMMON_PROTOCOL_GET_REGISTERED_PARAMETER_IDS_COMMAND_H
 
+#include <span>
+
 #include "parameter_system/common.h"
 #include "protocol/commands/internal/op_codes.h"
 #include "serial_communication_framework/command_interface.h"

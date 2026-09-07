@@ -1,6 +1,7 @@
 #include "serial_communication_framework/serialize_deserialize.h"
 
 #include <cstring>
+#include <span>
 
 #include "assert/assert.h"
 #include "math/crc.h"

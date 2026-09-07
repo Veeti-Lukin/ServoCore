@@ -2,6 +2,7 @@
 #define COMMON_PROTOCOL_WRITE_PARAM_VALUE_COMMAND_H
 
 #include <cstring>
+#include <span>
 
 #include "assert/assert.h"
 #include "parameter_system/common.h"

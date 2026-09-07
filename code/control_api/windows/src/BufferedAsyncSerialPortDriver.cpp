@@ -1,7 +1,11 @@
 #include "control_api/windows/internal/BufferedAsyncSerialportDriver.h"
 
 #include <format>
+#include <iomanip>
+#include <span>
 #include <stdexcept>
+#include <string>
+#include <string_view>
 #ifdef SERVO_CORE_CONTROL_API_WINDOWS_COMPORT_DRIVER_DEBUG_PRINTS
 #include <iostream>
 #endif

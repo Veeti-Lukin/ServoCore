@@ -1,5 +1,7 @@
 #include "control_api/windows/internal/ProgramUptimeClock.h"
 
+#include <chrono>
+
 namespace servo_core_control_api::windows::internal {
 
 // Define the static member
