@@ -3,11 +3,11 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt6 COMPONENTS Core Widgets SerialPort REQUIRED)
+find_package(Qt6 COMPONENTS Core Widgets SerialPort)
 
 if (NOT Qt6_FOUND)
     message(WARNING "QT binaries not found")
     set(QT_FOUND 0)
+else ()
+    set(QT_FOUND 1)
 endif ()
-
-set(QT_FOUND 1)
