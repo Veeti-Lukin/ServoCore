@@ -3,6 +3,12 @@
 
 
 # ----------------------------- Application setup ------------------------------
+# The dev tool talks to devices through the Windows control API backend, which only exists for Windows targets
+if (NOT TARGET control_api_windows)
+    message(STATUS "Dev tool skipped - it needs the Windows control API backend")
+    return()
+endif ()
+
 include(../cmake/qt_import.cmake)
 
 if (NOT QT_FOUND)

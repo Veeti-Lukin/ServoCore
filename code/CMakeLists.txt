@@ -34,7 +34,7 @@ if (SERVO_CORE_FIRMWARE_BUILD)
     add_subdirectory(common)
 else ()
     add_subdirectory(common)
-    add_subdirectory(dev_tool)
     add_subdirectory(control_api)
+    add_subdirectory(dev_tool) # after control_api, it checks for control_api_windows
 endif ()
 #-----------------------------------------------------------------------------
