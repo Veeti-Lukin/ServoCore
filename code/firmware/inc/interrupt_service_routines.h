@@ -18,5 +18,6 @@ ATTRIBUTE_ISR void debugUartCombinedISR();
 ATTRIBUTE_ISR void serialCommunicationUartCombinedISR();
 
 ATTRIBUTE_ISR void communicationTimeoutTimerISR();
+ATTRIBUTE_ISR void usbISR();
 
 #endif  // FIRMWARE_INTERRUPT_SERVICE_ROUTINES_H

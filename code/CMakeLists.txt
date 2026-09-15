@@ -71,5 +71,10 @@ else ()
     add_subdirectory(common)
     add_subdirectory(control_api)
     add_subdirectory(dev_tool) # after control_api, it checks for control_api_windows
+
+    if (SERVO_CORE_BUILD_TESTS)
+        # Firmware drivers with host-runnable tests against simulated hardware
+        add_subdirectory(firmware/drivers/pico/test)
+    endif ()
 endif ()
 #-----------------------------------------------------------------------------

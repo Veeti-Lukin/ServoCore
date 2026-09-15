@@ -15,6 +15,15 @@ add_library(drivers_pico
 
         inc/drivers/SysClockDriver.h
         src/SysClockDriver.cpp
+
+        inc/drivers/usb/usb_protocol.h
+        inc/drivers/usb/usb_descriptor_plan.h
+        inc/drivers/usb/UsbDeviceBase.h
+        src/usb/UsbDeviceBase.cpp
+        inc/drivers/usb/UsbCdcChannelBase.h
+        src/usb/UsbCdcChannelBase.cpp
+        inc/drivers/usb/UsbCdcChannel.h
+        inc/drivers/usb/UsbDevice.h
 )
 
 set_target_properties(drivers_pico PROPERTIES LINKER_LANGUAGE CXX)
@@ -34,6 +43,12 @@ target_link_libraries(drivers_pico PRIVATE
 target_link_libraries(drivers_pico PRIVATE
         pico_stdlib
         hardware_pwm
+        hardware_resets
+        hardware_irq
+        hardware_gpio
+        hardware_timer
+        pico_bootrom
+        pico_unique_id
 )
 
 target_link_libraries(drivers_pico PUBLIC drivers_interfaces)

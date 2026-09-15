@@ -33,6 +33,18 @@ DECLARE_PARAMETER(loop_back, ParameterIds::loob_back, uint8);
 
 }  // namespace test_params
 
+namespace usb_params {
+using parameter_system::ParameterDeclaration;
+using parameter_system::ParameterID;
+using parameter_system::ParameterValueType;
+
+DECLARE_PARAMETER(configured, ParameterIds::usb_configured, boolean);
+DECLARE_PARAMETER(bus_resets, ParameterIds::usb_bus_resets, uint32);
+DECLARE_PARAMETER(tx_drops, ParameterIds::usb_tx_drops, uint32);
+DECLARE_PARAMETER(rx_overruns, ParameterIds::usb_rx_overruns, uint32);
+
+}  // namespace usb_params
+
 }  // namespace protocol
 
 #endif  // COMMON_PROTOCOL_PARAMETERS_H
