@@ -25,6 +25,41 @@ message(STATUS "C compiler: ${CMAKE_C_COMPILER}  Version: ${CMAKE_C_COMPILER_VER
 if (SERVO_CORE_BUILD_TESTS)
     include(cmake/gtest_import.cmake)
 endif ()
+
+# --------- Experimental C++ 26 reflection support setup ----------
+include(CheckCXXCompilerFlag)
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    check_cxx_compiler_flag(-freflection _SUPPORTS_FREFLECTION_FLAG)
+    if (_SUPPORTS_FREFLECTION_FLAG)
+        add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-freflection>)
+        # try_compile does not inherit add_compile_options, so the check below has to be told
+        # about the flag separately
+        set(CMAKE_REQUIRED_FLAGS -freflection)
+    endif ()
+endif ()
+# TODO: Add clang or other similar here too
+
+include(CheckCXXSourceCompiles)
+
+set(_REFLECTION_TEST_SOURCE "
+#ifndef __cpp_impl_reflection
+#error no static reflection
+#endif
+int main() {}
+")
+check_cxx_source_compiles("${_REFLECTION_TEST_SOURCE}" _REFLECTION_TEST_COMPILES)
+# Cleared right after the check that needs it, so later check_ calls - including the ones inside
+# dependencies - are not compiled with the flag
+unset(CMAKE_REQUIRED_FLAGS)
+
+if (NOT _REFLECTION_TEST_COMPILES)
+    message(FATAL_ERROR
+            "${CMAKE_CXX_COMPILER} (${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}) does not "
+            "define __cpp_impl_reflection, A compiler with C++26 static reflection support is required")
+endif ()
+
+
 #-----------------------------------------------------------------------------
 
 
