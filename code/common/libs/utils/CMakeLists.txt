@@ -1,6 +1,7 @@
 add_library(utils STATIC
         inc/utils/RingBuffer.h
         inc/utils/StaticList.h
+        inc/utils/enum_helpers.h
 )
 
 set_target_properties(utils PROPERTIES LINKER_LANGUAGE CXX)
