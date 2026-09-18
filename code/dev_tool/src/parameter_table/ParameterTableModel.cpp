@@ -8,6 +8,7 @@
 
 #include "helpers.h"
 #include "parameter_system/common.h"
+#include "utils/enum_helpers.h"
 
 namespace parameter_table {
 
@@ -37,11 +38,11 @@ QVariant ParameterTableModel::data(const QModelIndex& index, int role) const {
             case static_cast<int>(Columns::name):
                 return row.meta_data.name;
             case static_cast<int>(Columns::category):
-                return parameter_system::mapParameterCategoryToString(row.meta_data.category);
+                return helpers::stringViewToQString(utils::enumToString(row.meta_data.category));
             case static_cast<int>(Columns::access):
-                return parameter_system::mapReadWriteAccessToString(row.meta_data.read_write_access);
+                return helpers::stringViewToQString(utils::enumToString(row.meta_data.read_write_access));
             case static_cast<int>(Columns::value_type):
-                return parameter_system::mapParameterValueTypeToString(row.meta_data.value_type);
+                return helpers::stringViewToQString(utils::enumToString(row.meta_data.value_type));
             case static_cast<int>(Columns::value):
                 return row.value;
         }

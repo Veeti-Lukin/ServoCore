@@ -63,62 +63,6 @@ struct ParameterMetaData {
     char               name[K_PARAMETER_NAME_MAX_LENGTH];
 };
 
-inline const char* mapParameterValueTypeToString(ParameterValueType param_type) {
-    switch (param_type) {
-        case ParameterValueType::uint8:
-            return "uint8";
-        case ParameterValueType::uint16:
-            return "uint16";
-        case ParameterValueType::uint32:
-            return "uint32";
-        case ParameterValueType::uint64:
-            return "uint64";
-        case ParameterValueType::int8:
-            return "int8";
-        case ParameterValueType::int16:
-            return "int16";
-        case ParameterValueType::int32:
-            return "int32";
-        case ParameterValueType::int64:
-            return "int64";
-        case ParameterValueType::floating_point:
-            return "floating_point";
-        case ParameterValueType::double_float:
-            return "double_float";
-        case ParameterValueType::boolean:
-            return "boolean";
-        case ParameterValueType::none:
-            return "none";
-
-        default:
-            return "unknown";
-    }
-}
-
-inline const char* mapReadWriteAccessToString(ReadWriteAccess read_write_access) {
-    switch (read_write_access) {
-        case ReadWriteAccess::read_only:
-            return "read_only";
-        case ReadWriteAccess::read_write:
-            return "read_write";
-        default:
-            return "unknown";
-    }
-}
-
-inline const char* mapParameterCategoryToString(ParameterCategory category) {
-    switch (category) {
-        case ParameterCategory::saved_parameter:
-            return "Saved";
-        case ParameterCategory::runtime_parameter:
-            return "Runtime";
-        case ParameterCategory::signal:
-            return "Signal";
-        default:
-            return "unknown";
-    }
-}
-
 }  // namespace parameter_system
 
 #endif  // COMMON_LIBS_PARAMETERSYSTEM_DEFINITIONS_H

@@ -1,3 +1,7 @@
+# Registers tests with CTest, so `ctest` in the build directory finds what gtest_discover_tests adds.
+# Must run in the top-level directory, which is where this file is included from.
+enable_testing()
+
 include(FetchContent)
 
 FetchContent_Declare(
