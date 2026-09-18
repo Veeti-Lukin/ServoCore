@@ -202,11 +202,12 @@ uint16_t PwmSliceDriver::getWrap() const { return pwm_hw->slice[slice_index_].to
 uint16_t PwmSliceDriver::getCounterCompareValue(PwmChannel channel) const {
     uint32_t cc_value = pwm_hw->slice[slice_index_].cc;
 
+    // The _BITS macros are masks, not bit counts, so they are applied before shifting down
     if (channel == PwmChannel::A) {
-        return (cc_value >> PWM_CH0_CC_A_LSB) & ((1 << PWM_CH0_CC_A_BITS) - 1);
+        return (cc_value & PWM_CH0_CC_A_BITS) >> PWM_CH0_CC_A_LSB;
     }
     if (channel == PwmChannel::B) {
-        return (cc_value >> PWM_CH0_CC_B_LSB) & ((1 << PWM_CH0_CC_B_BITS) - 1);
+        return (cc_value & PWM_CH0_CC_B_BITS) >> PWM_CH0_CC_B_LSB;
     }
     // Should not happen
     ASSERT(channel == PwmChannel::A || channel == PwmChannel::B);
