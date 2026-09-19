@@ -18,7 +18,7 @@ namespace drivers::general {
  *
  * @note Ensure that a debugger is attached; otherwise, behavior may be undefined.
  */
-inline void volatile triggerBreakpoint() {
+inline void triggerBreakpoint() {
 #if defined(__GNUC__) || defined(__clang__)  // GCC/Clang
 #if defined(__arm__) || defined(__thumb__)   // ARM (RP2040, STM32, etc.)
     __asm volatile("bkpt #0" : : : "memory");
