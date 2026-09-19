@@ -130,7 +130,7 @@ void initSWLibs() {
     protocol_handler.registerCommandHandler<protocol::commands::WriteParamValue, protocol_handlers::writeParamValue>();
 }
 
-[[noreturn]] int main() {
+int main() {
     initHW();  // TODO can sw libs be initialized first? At least assert lib should be but uart should be initialized
                // for that
     initSWLibs();
