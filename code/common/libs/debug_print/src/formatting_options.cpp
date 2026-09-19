@@ -5,7 +5,7 @@ constexpr char K_HEX_NUMERIC_BASE_CHAR    = 'x';
 
 namespace debug_print::internal {
 
-extern FormattingOptions g_formatting_options{};
+FormattingOptions g_formatting_options{};
 
 bool tryParseFormattingOptions(char option) {
     bool is_formatting_option = true;

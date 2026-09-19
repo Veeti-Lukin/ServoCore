@@ -2,8 +2,8 @@
 
 namespace debug_print {
 
-extern PutCharFunctionPointerType put_char_function_pointer = nullptr;
-extern FlushFunctionPointerType   flush_function_pointer    = nullptr;
+PutCharFunctionPointerType put_char_function_pointer = nullptr;
+FlushFunctionPointerType   flush_function_pointer    = nullptr;
 
 void connectPutCharAndFlushFunctions(PutCharFunctionPointerType put_char_function,
                                      FlushFunctionPointerType   flush_function) {
