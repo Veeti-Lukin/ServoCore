@@ -15,6 +15,11 @@ namespace parameter_table {
  * ensuring that the correct input widgets (e.g., spin boxes, combo boxes)
  * are used when editing parameters in the table. It inherits from
  * QStyledItemDelegate to override the default behavior of item editors.
+ *
+ * Everything it needs about a row it reads off the index, through the k_value_type_role role and
+ * the standard edit role. Indexes reaching a delegate come from whichever proxy model the view
+ * is showing, so they cannot be resolved back to a RowData without mapping them to the source
+ * first — while a role travels through any number of proxies untouched.
  */
 class ParameterValueDelegate : public QStyledItemDelegate {
     Q_OBJECT
@@ -22,10 +27,9 @@ class ParameterValueDelegate : public QStyledItemDelegate {
 public:
     /**
      * @brief Constructs a ParameterValueDelegate.
-     * @param rows Reference to a vector of RowData objects containing parameter data.
      * @param parent Optional parent object.
      */
-    explicit ParameterValueDelegate(QVector<RowData>& rows, QObject* parent = nullptr);
+    explicit ParameterValueDelegate(QObject* parent = nullptr);
 
     /**
      * @brief Creates an editor widget for a given index.
@@ -79,7 +83,8 @@ public:
                               const QModelIndex& index) const override;
 
 private:
-    QVector<RowData>& rows_;  ///< Reference to the vector of RowData containing parameter values.
+    /// @brief The value type of the row an index points at, or `none` when it has no value.
+    [[nodiscard]] static parameter_system::ParameterValueType valueTypeOf(const QModelIndex& index);
 };
 
 }  // namespace parameter_table

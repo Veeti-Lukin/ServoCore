@@ -53,6 +53,14 @@ void MainWindow::refreshDeviceList() {
     devices_.clear();
     ui->deviceListWidget->clear();
 
+    // --- MOCK PARAMETERS (issue #3, stage 1) ---
+    // The parameter tree is being built before the firmware can report parameter groups, so the
+    // dev tool has to be openable with no hardware attached. This entry opens a device control
+    // widget with no device behind it, which fills its parameter tree with mock rows.
+    // Delete this block once the mock is gone.
+    ui->deviceListWidget->addItem("mock device");
+    // --- END MOCK PARAMETERS ---
+
     if (context_ == nullptr) return;
 
     /* TODO Timeouts do not work yet on the serial framework so this cant be done yet
@@ -74,12 +82,23 @@ void MainWindow::refreshDeviceList() {
 }
 
 void MainWindow::openDeviceDelegateWidget() {
-    size_t                          selected_device_id = ui->deviceListWidget->currentItem()->text().toInt();
-    servo_core_control_api::Device& selected_device =
-        *std::find_if(devices_.begin(), devices_.end(),
-                      [&](servo_core_control_api::Device& device) { return device.getId() == selected_device_id; });
+    // --- MOCK PARAMETERS (issue #3, stage 1) ---
+    // Nothing answered on the bus, so there is no Device to hand over. The control widget takes
+    // a nullptr and fills its parameter tree with mock rows instead. Delete this block, and the
+    // one in refreshDeviceList(), once the mock is gone.
+    if (devices_.isEmpty()) {
+        ui->centralwidget->layout()->addWidget(new DeviceControlWidget(nullptr, ui->centralwidget));
+        return;
+    }
+    // --- END MOCK PARAMETERS ---
 
-    ui->centralwidget->layout()->addWidget(new DeviceControlWidget(selected_device, ui->centralwidget));
+    size_t selected_device_id = ui->deviceListWidget->currentItem()->text().toInt();
+    auto   selected_device =
+        std::find_if(devices_.begin(), devices_.end(),
+                     [&](servo_core_control_api::Device& device) { return device.getId() == selected_device_id; });
+    if (selected_device == devices_.end()) return;
+
+    ui->centralwidget->layout()->addWidget(new DeviceControlWidget(&*selected_device, ui->centralwidget));
 }
 
 void MainWindow::setupComPortSelector() {

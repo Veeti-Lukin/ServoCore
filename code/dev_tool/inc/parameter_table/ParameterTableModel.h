@@ -1,8 +1,7 @@
 #ifndef DEV_TOOL_PARAMETER_TABLE_PARAMETERTABLEMODEL_H
 #define DEV_TOOL_PARAMETER_TABLE_PARAMETERTABLEMODEL_H
 
-#include <QAbstractTableModel>
-#include <QVector>
+#include <QAbstractItemModel>
 
 #include "common.h"
 #include "parameter_system/common.h"
@@ -11,19 +10,23 @@ namespace parameter_table {
 
 /**
  * @class ParameterTableModel
- * @brief Represents a table model for displaying and managing parameter data.
+ * @brief Tree model over the parameters of a device, grouped into parameter groups.
  *
- * This class extends QAbstractTableModel, which is a base class for creating table-like data models.
- * It provides an interface for retrieving and modifying parameters that are displayed in a table view.
+ * This class extends QAbstractItemModel, the base class for models whose rows form a tree.
+ * It provides an interface for retrieving and modifying parameters that are displayed in a
+ * QTreeView.
  *
  * The model allows:
- * - Displaying parameters with multiple attributes (ID, Name, Access, Type, Value).
- * - Sorting data based on a selected column.
+ * - Displaying parameters with multiple attributes (Name, ID, Category, Access, Type, Value).
+ * - Nesting parameters under group rows, to any depth.
  * - Editing parameter values if permitted.
  *
- * This model is used with a QTableView to provide a structured, interactive display of parameters.
+ * Rows live in a RowData tree owned by the caller; the model only reads and writes through the
+ * reference it is given. Sorting and filtering are not implemented here — they belong to the
+ * proxy model in front of this one, which is why this class exposes the underlying values
+ * through the k_sort_role and k_filter_text_role roles.
  */
-class ParameterTableModel final : public QAbstractTableModel {
+class ParameterTableModel final : public QAbstractItemModel {
     Q_OBJECT
 
 signals:
@@ -40,31 +43,52 @@ signals:
 
 public:
     /**
-     * @brief Constructs a ParameterTableModel with a reference to the parameter data.
+     * @brief Constructs a ParameterTableModel over an existing row tree.
      *
-     * @param rows A reference to the vector containing parameter data.
+     * @param root The root node of the tree. It is never shown itself; its children become the
+     *             top level rows. The tree has to outlive the model.
      * @param parent The parent QObject (optional).
      */
-    explicit ParameterTableModel(QVector<RowData>& rows, QObject* parent = nullptr);
+    explicit ParameterTableModel(RowData& root, QObject* parent = nullptr);
 
     /**
-     * @brief Returns the number of rows in the table.
+     * @brief Creates the index of a child row.
      *
-     * @param parent The parent index (ignored since this is a flat table model).
-     * @return The number of rows in the table.
+     * @param row The position of the row under @p parent.
+     * @param column The column of the cell.
+     * @param parent The parent row, or an invalid index for the top level rows.
+     * @return The index of the cell, or an invalid index if there is no such cell.
+     */
+    [[nodiscard]] QModelIndex index(int row, int column, const QModelIndex& parent) const override;
+
+    /**
+     * @brief Returns the index of the row that @p index sits under.
+     *
+     * @param index The index whose parent is asked for.
+     * @return The parent row's index, or an invalid index for a top level row.
+     */
+    [[nodiscard]] QModelIndex parent(const QModelIndex& index) const override;
+
+    /**
+     * @brief Returns the number of rows directly underneath a row.
+     *
+     * @param parent The parent row, or an invalid index to count the top level rows.
+     * @return The number of child rows.
      */
     [[nodiscard]] int rowCount(const QModelIndex& parent) const override;
 
     /**
-     * @brief Returns the number of columns in the table.
+     * @brief Returns the number of columns.
      *
-     * @param parent The parent index (ignored since this is a flat table model).
+     * Every row has the same columns, at every level of the tree.
+     *
+     * @param parent The parent index (ignored).
      * @return The number of columns.
      */
     [[nodiscard]] int columnCount(const QModelIndex& parent) const override;
 
     /**
-     * @brief Retrieves the data for a given cell in the table.
+     * @brief Retrieves the data for a given cell.
      *
      * @param index The model index representing the requested cell.
      * @param role The role that specifies the type of data to retrieve (e.g., display text).
@@ -110,21 +134,33 @@ public:
      * Used by refresh paths that just want to push the latest device value into the cell
      * without triggering a write-back round-trip.
      *
-     * @param row_index Row whose value cell should be updated.
-     * @param value     New display value.
+     * @param parameter_row The row whose value cell should be updated.
+     * @param value         New display value.
      */
-    void updateValueFromDevice(int row_index, const QVariant& value);
+    void updateValueFromDevice(RowData& parameter_row, const QVariant& value);
 
     /**
-     * @brief Sorts the table based on the specified column and order.
+     * @brief Returns the row node an index of this model points at.
      *
-     * @param column_index The column index to sort by.
-     * @param order The sorting order (ascending or descending).
+     * Only valid for indexes of this model. An index taken from a proxy model has to be mapped
+     * to the source first.
+     *
+     * @param index The index to resolve.
+     * @return The node, or nullptr for an invalid index.
      */
-    void sort(int column_index, Qt::SortOrder order) override;
+    [[nodiscard]] static RowData* nodeFromIndex(const QModelIndex& index);
+
+    /**
+     * @brief Returns the index of a cell of a node.
+     *
+     * @param node The node the cell belongs to. Has to be part of this model's tree.
+     * @param column The column of the cell.
+     * @return The index of the cell.
+     */
+    [[nodiscard]] QModelIndex indexOfNode(RowData& node, Columns column) const;
 
 private:
-    QVector<RowData>& rows_;  ///< A reference to the list of parameter data rows.
+    RowData& root_;  ///< Root of the row tree. Never shown; only its descendants are.
 };
 
 }  // namespace parameter_table

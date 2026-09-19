@@ -43,6 +43,12 @@ add_executable(${_SERVO_CORE_DEVTOOL_TARGET}
         inc/parameter_table/ParameterTableModel.h
         src/parameter_table/ParameterTableModel.cpp
 
+        inc/parameter_table/ParameterFilterProxyModel.h
+        src/parameter_table/ParameterFilterProxyModel.cpp
+
+        inc/parameter_table/ParameterNameDelegate.h
+        src/parameter_table/ParameterNameDelegate.cpp
+
         inc/parameter_table/ParameterValueDelegate.h
         src/parameter_table/ParameterValueDelegate.cpp
         # ------ ---------------- ------
