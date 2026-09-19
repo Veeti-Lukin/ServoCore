@@ -64,6 +64,9 @@ QWidget* ParameterValueDelegate::createEditor(QWidget* parent, const QStyleOptio
         case parameter_system::ParameterValueType::none:
             break;
     }
+
+    // Returning a nullptr is how the delegate tells the view that the cell is not editable
+    return nullptr;
 }
 
 void ParameterValueDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const {
