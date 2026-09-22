@@ -29,3 +29,20 @@ option(SERVO_CORE_DISABLE_SERIAL_COMMUNICATION_FRAMEWORK_TIMEOUTS "Disable seria
 if (SERVO_CORE_DISABLE_SERIAL_COMMUNICATION_FRAMEWORK_TIMEOUTS)
     target_compile_definitions(serial_communication_framework PRIVATE SERVO_CORE_DISABLE_SERIAL_COMMUNICATION_FRAMEWORK_TIMEOUTS=1)
 endif ()
+
+if (SERVO_CORE_BUILD_TESTS)
+    add_executable(serial_communication_framework_tests
+            test/slave_handler_test.cpp
+    )
+
+    target_link_libraries(serial_communication_framework_tests
+            serial_communication_framework
+            drivers_interfaces
+            math
+            utils
+            GTest::gtest_main
+    )
+
+    include(GoogleTest)
+    gtest_discover_tests(serial_communication_framework_tests)
+endif ()

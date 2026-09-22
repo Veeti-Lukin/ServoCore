@@ -20,15 +20,12 @@ SlaveHandler::SlaveHandler(drivers::interfaces::BufferedSerialCommunicationInter
 void SlaveHandler::init() { /* TODO SET THE SERIAL COMMUNICATION SETTINGS */ }
 
 void SlaveHandler::run() {
-    static size_t rx_index             = 0;
-    static size_t expected_packet_size = RequestPacket::K_PACKET_MAX_SIZE;
-
     if (communication_interface_.getReceivedBytesAvailableAmount() > 0) {
-        rx_buffer_[rx_index] = communication_interface_.readReceivedByte();
-        rx_index++;
+        rx_buffer_[rx_index_] = communication_interface_.readReceivedByte();
+        rx_index_++;
     }
 
-    if (rx_index == RequestPacket::K_HEADER_SIZE) {
+    if (rx_index_ == RequestPacket::K_HEADER_SIZE) {
         RequestPacket::Header header = deSerializeRequestHeader(rx_buffer_);
 
         if (!requestHeaderHasValidCrc(header)) {
@@ -37,7 +34,7 @@ void SlaveHandler::run() {
             std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
 
             // restore index to default
-            rx_index                               = 0;
+            rx_index_                              = 0;
 
             if (responseHasTimedout()) {
                 // Do not answer if the timeout has happened on slave side and let the master run to timeout
@@ -48,15 +45,15 @@ void SlaveHandler::run() {
             return;
         }
 
-        expected_packet_size = header.payload_size + RequestPacket::K_HEADER_WITH_PAYLOAD_CRC_SIZE;
+        expected_packet_size_ = header.payload_size + RequestPacket::K_HEADER_WITH_PAYLOAD_CRC_SIZE;
         return;
     }
 
     // TODO SIZE OFF BY 1 indexing error?
-    if (rx_index == expected_packet_size) {
+    if (rx_index_ == expected_packet_size_) {
         // restore to defaults
-        rx_index             = 0;
-        expected_packet_size = RequestPacket::K_PACKET_MAX_SIZE;
+        rx_index_             = 0;
+        expected_packet_size_ = RequestPacket::K_PACKET_MAX_SIZE;
 
         startResponseTimeout();
 

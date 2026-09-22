@@ -60,6 +60,12 @@ private:
     uint8_t rx_buffer_[RequestPacket::K_PACKET_MAX_SIZE]               = {};
     uint8_t command_staging_buffer_[RequestPacket::K_PAYLOAD_MAX_SIZE] = {};
 
+    // Receive progress for the packet currently being assembled. This belongs to the instance: a device that
+    // serves the protocol on more than one link (field bus UART and USB) runs one handler per link from the
+    // same loop, and sharing the state lets one link reset the other's half-received packet.
+    size_t rx_index_             = 0;
+    size_t expected_packet_size_ = RequestPacket::K_PACKET_MAX_SIZE;
+
     drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface_;
     CommunicationStatistics                                    communication_statistics_;
     uint8_t                                                    device_id_;
