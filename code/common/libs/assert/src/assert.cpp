@@ -2,8 +2,8 @@
 
 namespace assert {
 
-extern AssertionFailedHandlerFunctionPointerType assertion_handler    = nullptr;
-extern OnAssertFailReaction                      assert_fail_reaction = OnAssertFailReaction::break_point;
+AssertionFailedHandlerFunctionPointerType assertion_handler    = nullptr;
+OnAssertFailReaction                      assert_fail_reaction = OnAssertFailReaction::break_point;
 
 void connectAssertionFailedHandler(AssertionFailedHandlerFunctionPointerType handler) { assertion_handler = handler; }
 void disconnectAssertionFailedHandler() { assertion_handler = nullptr; }

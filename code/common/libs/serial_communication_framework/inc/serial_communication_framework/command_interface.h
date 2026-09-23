@@ -27,7 +27,7 @@ enum class ParsingError {
 //
 
 struct RequestBase {
-    using ParsingError                                                     = ParsingError;
+    using ParsingError                                                     = commands::ParsingError;
 
     virtual ~RequestBase()                                                 = default;
 
@@ -36,7 +36,7 @@ struct RequestBase {
 };
 
 struct ResponseBase {
-    using ParsingError                                                     = ParsingError;
+    using ParsingError                                                     = commands::ParsingError;
 
     virtual ~ResponseBase()                                                = default;
 

@@ -6,7 +6,7 @@
 
 namespace assert::internal {
 
-[[noreturn]] void onAssertFail(const char* expression, const char* message, const char* file, int line) {
+void onAssertFail(const char* expression, const char* message, const char* file, int line) {
 #if ASSERT_LEVEL >= ASSERT_LEVEL_VERBOSE
     DEBUG_PRINT("\n\n\nAssertion triggered!\n");
 #endif
@@ -38,7 +38,7 @@ namespace assert::internal {
     }
 }
 
-[[noreturn]] void onAssertFail() {
+void onAssertFail() {
     if (getAssertionFailedReaction() == OnAssertFailReaction::call_assertion_handler ||
         getAssertionFailedReaction() == OnAssertFailReaction::call_assertion_handler_and_break_point) {
         if (getAssertionFailedHandler() != nullptr) getAssertionFailedHandler()();

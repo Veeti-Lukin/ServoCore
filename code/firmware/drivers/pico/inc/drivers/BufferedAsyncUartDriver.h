@@ -338,6 +338,9 @@ unsigned int BufferedAsyncUartDriver<tx_buffer_size, rx_buffer_size>::getNvicCom
     if (uart_instance_ == uart0) return UART0_IRQ;
     if (uart_instance_ == uart1) return UART1_IRQ;
     ASSERT_WITH_MESSAGE(false, "Unknown uart module, cant map to NVIC irq");
+
+    // Only reached if the assertion is disabled or its handler returns
+    return UART0_IRQ;
 }
 
 }  // namespace drivers

@@ -3,8 +3,8 @@
 
 namespace assert::internal {
 
-[[noreturn]] void onAssertFail(const char* expression, const char* message, const char* file, int line);
-[[noreturn]] void onAssertFail();
+void onAssertFail(const char* expression, const char* message, const char* file, int line);
+void onAssertFail();
 
 }  // namespace assert::internal
 

@@ -96,11 +96,14 @@ uint8_t RingBuffer<size>::pop() volatile {
 
     const uint8_t element = buffer_[tail_];
 
-    tail_++;
+    // Incrementing a volatile in place is deprecated, so the next index is worked out in a plain
+    // local and only the finished value is written back
+    size_t next_tail      = tail_ + 1;
     // wrap around in the end
-    if (tail_ == size) {
-        tail_ = 0;
+    if (next_tail == size) {
+        next_tail = 0;
     }
+    tail_ = next_tail;
 
     return element;
 }
@@ -109,13 +112,16 @@ template <size_t size>
 bool RingBuffer<size>::push(uint8_t item) volatile {
     if (isFull()) return false;
 
-    buffer_[head_] = item;
-    head_++;
+    buffer_[head_]   = item;
 
+    // Incrementing a volatile in place is deprecated, so the next index is worked out in a plain
+    // local and only the finished value is written back
+    size_t next_head = head_ + 1;
     // wrap around in the end
-    if (head_ == size) {
-        head_ = 0;
+    if (next_head == size) {
+        next_head = 0;
     }
+    head_ = next_head;
 
     return true;
 }
