@@ -33,18 +33,11 @@ void SlaveHandler::run() {
 
         if (!requestHeaderHasValidCrc(header)) {
             communication_statistics_.corrupted_packets_received++;
-            ResponsePacket     response(static_cast<uint8_t>(ResponseCode::corrupted), {});
-            std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
 
             // restore index to default
-            rx_index                               = 0;
+            rx_index = 0;
 
-            if (responseHasTimedout()) {
-                // Do not answer if the timeout has happened on slave side and let the master run to timeout
-                return;
-            }
-
-            communication_interface_.transmitBytes(serialized_response);
+            // A corrupted packet is not answered at all, the master is left to run to its timeout
             return;
         }
 
@@ -82,16 +75,8 @@ void SlaveHandler::run() {
 
         if (!requestPayloadHasValidCrc(packet)) {
             communication_statistics_.corrupted_packets_received++;
-            ResponsePacket     response(static_cast<uint8_t>(ResponseCode::corrupted), {});
-            std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
 
-            if (responseHasTimedout()) {
-                communication_statistics_.timed_out_packets++;
-                // Do not answer if the timeout has happened on slave side and let the master run to timeout
-                return;
-            }
-
-            communication_interface_.transmitBytes(serialized_response);
+            // A corrupted packet is not answered at all, the master is left to run to its timeout
             return;
         }
         communication_statistics_.valid_packets_received++;
