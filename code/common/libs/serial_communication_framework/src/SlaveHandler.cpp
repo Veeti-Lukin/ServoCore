@@ -32,6 +32,7 @@ void SlaveHandler::run() {
         RequestPacket::Header header = deSerializeRequestHeader(rx_buffer_);
 
         if (!requestHeaderHasValidCrc(header)) {
+            communication_statistics_.total_packets_received++;
             communication_statistics_.corrupted_packets_received++;
 
             // restore index to default
@@ -55,22 +56,8 @@ void SlaveHandler::run() {
 
         RequestPacket packet = deSerializeRequest(rx_buffer_);
 
-        // TODO which way around should this be check the crc first or the id
-        // if id then if tha packet is still corrupted and the id field is faulty this device might conflict with
-        // the device the packet was meant for if it gets the packet correctly if crc first and the packet is
-        // corrupted the the packet might be for some other device and the if it gets the packet correctly same
-        // issue happens
-
-        // This way it is really unlikely that even if the packet is corrupted te id of the packet would be device
-        // id
-
-        // Check if the packet is for this device or not
-        // If not, do not do anything with the packet
-        if (packet.header.receiver_id != device_id_) {
-            return;
-        }
-
-        // only increment this after te id checking
+        // The crc is checked before the receiver id: a corrupted id cannot be trusted to tell who the packet
+        // was meant for, so the statistics count every packet seen on the bus, not only the ones for this device
         communication_statistics_.total_packets_received++;
 
         if (!requestPayloadHasValidCrc(packet)) {
@@ -80,6 +67,12 @@ void SlaveHandler::run() {
             return;
         }
         communication_statistics_.valid_packets_received++;
+
+        // Check if the packet is for this device or not
+        // If not, do not do anything with the packet
+        if (packet.header.receiver_id != device_id_) {
+            return;
+        }
 
         AdapterFunc adapter_func = command_handlers_[packet.header.operation_code];
 
