@@ -36,7 +36,7 @@ public:
 
         while (rx_index < expected_packet_size) {
             if (responseHasTimedout()) {
-                communication_statistics_.timed_out_packets++;
+                communication_statistics_.timed_out_requests++;
 
                 typename T_Command::Response command_response;
                 command_response.response_code = ResponseCode::timed_out;
@@ -53,7 +53,8 @@ public:
                 expected_packet_size          = header.payload_size + ResponsePacket::K_HEADER_WITH_PAYLOAD_CRC_SIZE;
 
                 if (!responseHeaderHasValidCrc(header)) {
-                    communication_statistics_.corrupted_packets_received++;
+                    communication_statistics_.responses.received++;
+                    communication_statistics_.responses.corrupted++;
 
                     typename T_Command::Response command_response;
                     command_response.response_code = ResponseCode::corrupted;
@@ -63,17 +64,17 @@ public:
         }
 
         ResponsePacket response = deSerializeResponse(rx_buffer_);
-        communication_statistics_.total_packets_received++;
+        communication_statistics_.responses.received++;
 
         if (!responsePayloadHasValidCrc(response)) {
-            communication_statistics_.corrupted_packets_received++;
+            communication_statistics_.responses.corrupted++;
 
             typename T_Command::Response command_response;
             command_response.response_code = ResponseCode::corrupted;
             return command_response;
         }
 
-        communication_statistics_.valid_packets_received++;
+        communication_statistics_.responses.valid++;
 
         // TODO Resetting tx buffer and rx buffer
 
@@ -95,7 +96,7 @@ public:
 
     void run();
 
-    [[nodiscard]] const CommunicationStatistics& getStatistics() const;
+    [[nodiscard]] const MasterCommunicationStatistics& getStatistics() const;
 
 private:
     uint8_t tx_buffer_[RequestPacket::K_PACKET_MAX_SIZE]              = {};
@@ -103,7 +104,7 @@ private:
     uint8_t command_staging_buffer[RequestPacket::K_PAYLOAD_MAX_SIZE] = {};
 
     drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface_;
-    CommunicationStatistics                                    communication_statistics_;
+    MasterCommunicationStatistics                              communication_statistics_;
 
     drivers::interfaces::ClockInterface& timeout_clock_;
     uint64_t                             response_timout_start_time_point_;

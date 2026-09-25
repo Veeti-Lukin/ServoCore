@@ -32,11 +32,30 @@ enum class ResponseCode : uint8_t {
     unset_default_value    = 0xFF,
 };
 
-struct CommunicationStatistics {
-    uint64_t total_packets_received     = 0;
-    uint64_t corrupted_packets_received = 0;
-    uint64_t valid_packets_received     = 0;
-    uint64_t timed_out_packets          = 0;
+struct PacketCounters {
+    uint64_t received  = 0;
+    uint64_t corrupted = 0;
+    uint64_t valid     = 0;
+};
+
+// A request whose header crc failed carries no trustworthy receiver id, so it can only ever be counted
+// in all_requests. Every request that gets past the header check can be attributed, including one whose
+// payload turns out to be corrupt.
+struct SlaveCommunicationStatistics {
+    PacketCounters all_requests;              // every request seen on the bus
+    PacketCounters requests_for_this_device;  // the subset this device could tell were its own
+
+    // Requests this device handled whose answer was only ready after the slave side timeout. The answer
+    // is dropped instead of sent late, leaving the master to run to its own timeout.
+    uint64_t dropped_late_answers = 0;
+};
+
+// Every response the master receives answers a request it sent, so there is nothing to attribute.
+struct MasterCommunicationStatistics {
+    PacketCounters responses;
+
+    // Requests that got no complete response before the master side timeout expired.
+    uint64_t timed_out_requests = 0;
 };
 
 // TODO if band with estimation is added calculate the timeouts based on how long message should take to send + handling

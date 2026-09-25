@@ -53,7 +53,7 @@ public:
 
     void run();
 
-    [[nodiscard]] const CommunicationStatistics& getCommunicationStatistics() const;
+    [[nodiscard]] const SlaveCommunicationStatistics& getCommunicationStatistics() const;
 
 private:
     uint8_t tx_buffer_[ResponsePacket::K_PACKET_MAX_SIZE]              = {};
@@ -61,7 +61,7 @@ private:
     uint8_t command_staging_buffer_[RequestPacket::K_PAYLOAD_MAX_SIZE] = {};
 
     drivers::interfaces::BufferedSerialCommunicationInterface& communication_interface_;
-    CommunicationStatistics                                    communication_statistics_;
+    SlaveCommunicationStatistics                               communication_statistics_;
     uint8_t                                                    device_id_;
 
     drivers::interfaces::ClockInterface& timeout_clock_;

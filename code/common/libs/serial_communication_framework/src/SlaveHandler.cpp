@@ -32,8 +32,10 @@ void SlaveHandler::run() {
         RequestPacket::Header header = deSerializeRequestHeader(rx_buffer_);
 
         if (!requestHeaderHasValidCrc(header)) {
-            communication_statistics_.total_packets_received++;
-            communication_statistics_.corrupted_packets_received++;
+            // The receiver id is part of the header that just failed, so this one can never be
+            // attributed to a device
+            communication_statistics_.all_requests.received++;
+            communication_statistics_.all_requests.corrupted++;
 
             // restore index to default
             rx_index = 0;
@@ -56,23 +58,26 @@ void SlaveHandler::run() {
 
         RequestPacket packet = deSerializeRequest(rx_buffer_);
 
-        // The crc is checked before the receiver id: a corrupted id cannot be trusted to tell who the packet
-        // was meant for, so the statistics count every packet seen on the bus, not only the ones for this device
-        communication_statistics_.total_packets_received++;
+        // The header crc already passed, so the receiver id can be trusted for the statistics even when
+        // the payload turns out to be corrupt
+        const bool for_this_device = packet.header.receiver_id == device_id_;
+
+        communication_statistics_.all_requests.received++;
+        if (for_this_device) communication_statistics_.requests_for_this_device.received++;
 
         if (!requestPayloadHasValidCrc(packet)) {
-            communication_statistics_.corrupted_packets_received++;
+            communication_statistics_.all_requests.corrupted++;
+            if (for_this_device) communication_statistics_.requests_for_this_device.corrupted++;
 
             // A corrupted packet is not answered at all, the master is left to run to its timeout
             return;
         }
-        communication_statistics_.valid_packets_received++;
 
-        // Check if the packet is for this device or not
-        // If not, do not do anything with the packet
-        if (packet.header.receiver_id != device_id_) {
-            return;
-        }
+        communication_statistics_.all_requests.valid++;
+        if (for_this_device) communication_statistics_.requests_for_this_device.valid++;
+
+        // Only a request meant for this device is acted on
+        if (!for_this_device) return;
 
         AdapterFunc adapter_func = command_handlers_[packet.header.operation_code];
 
@@ -88,7 +93,7 @@ void SlaveHandler::run() {
         std::span<uint8_t> serialized_response = serializeResponse(response, tx_buffer_);
 
         if (responseHasTimedout()) {
-            communication_statistics_.timed_out_packets++;
+            communication_statistics_.dropped_late_answers++;
             // Do not answer if the timeout has happened on slave side and let the master run to timeout
             return;
         }
@@ -98,7 +103,7 @@ void SlaveHandler::run() {
     }
 }
 
-const CommunicationStatistics& SlaveHandler::getCommunicationStatistics() const { return communication_statistics_; }
+const SlaveCommunicationStatistics& SlaveHandler::getCommunicationStatistics() const { return communication_statistics_; }
 
 void SlaveHandler::startResponseTimeout() { response_timout_start_time_point_ = timeout_clock_.uptimeMilliseconds(); }
 
