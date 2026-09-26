@@ -82,7 +82,7 @@ void MasterHandler::run() {
     // TODO implement
 }
 
-const CommunicationStatistics& MasterHandler::getStatistics() const { return communication_statistics_; }
+const MasterCommunicationStatistics& MasterHandler::getStatistics() const { return communication_statistics_; }
 
 void MasterHandler::startResponseTimeout() { response_timout_start_time_point_ = timeout_clock_.uptimeMilliseconds(); }
 
